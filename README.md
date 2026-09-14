@@ -1,8 +1,8 @@
-Spanish Political Communication
+# Spanish Political Communication
 
 Computational research on political communication in Spain, integrating social media posts, parliamentary interventions, media interviews, and other publicly available political discourse.
 
-Overview
+## Overview
 
 This project aims to build a longitudinal, multimodal corpus of political communication produced by three major Spanish political figures:
 
@@ -14,7 +14,7 @@ The project will collect and analyse publicly available political discourse acro
 
 The initial focus will be on material available from X, parliamentary interventions, and media interviews, although additional sources may be incorporated where they are sufficiently accessible, reliable, and relevant to the research objectives.
 
-Research objectives
+## Research objectives
 
 The project will investigate, among other aspects:
 
@@ -29,29 +29,29 @@ The project will investigate, among other aspects:
 
 The specific research questions and analytical dimensions will be refined as the corpus is constructed and the available data are assessed.
 
-Data sources
+## Data sources
 
 The project will prioritize publicly available sources, including:
 
-X
+### X
 
 Posts published by the official accounts associated with the three selected political figures, subject to the availability and applicable terms of the relevant APIs and data-access mechanisms.
 
-Parliamentary interventions
+### Parliamentary interventions
 
 Publicly available interventions in the Spanish parliamentary context, including relevant speeches, debates, questions, replies, and other parliamentary contributions where structured or reliable source data are available.
 
-Media interviews
+### Media interviews
 
 Interviews and other relevant appearances in publicly accessible media sources, subject to availability, licensing, accessibility, and the possibility of reliably obtaining and processing the underlying textual material.
 
-Additional sources
+### Additional sources
 
 Other sources may be incorporated when they provide relevant, publicly available material that contributes to the longitudinal analysis of political communication.
 
 All sources will be documented to facilitate reproducibility and provenance tracking.
 
-Methodology
+## Methodology
 
 The project will use methods from Natural Language Processing (NLP) and computational social science.
 
@@ -72,7 +72,7 @@ Potential analytical approaches include:
 
 Automated analyses will be evaluated against manually annotated samples whenever appropriate.
 
-Corpus structure
+## Corpus structure
 
 The intended corpus will preserve information about both the content and provenance of each document.
 
@@ -105,7 +105,7 @@ Each document should retain, where available, metadata such as:
 
 The exact schema will evolve as the different data sources are integrated.
 
-Reproducibility
+## Reproducibility
 
 The repository is intended to support reproducible computational research.
 
@@ -123,7 +123,7 @@ Code will be organized into components for:
 
 Raw data will only be stored or redistributed when permitted by the terms applicable to the corresponding source. Where redistribution of source content is restricted, the repository will prioritize reproducible code, derived data where permissible, document identifiers, metadata, and procedures for reconstructing the corpus.
 
-Ethical and legal considerations
+## Ethical and legal considerations
 
 The project focuses primarily on public political communication produced by public political figures.
 
@@ -137,22 +137,22 @@ The research is intended for academic, non-commercial purposes. Data collection 
 
 The project does not aim to profile individual members of the public or infer sensitive personal characteristics from private individuals.
 
-Research scope
+## Research scope
 
 The initial corpus will focus on Pedro Sánchez, Santiago Abascal, and Alberto Núñez Feijóo. The temporal scope is expected to be longitudinal, allowing the analysis of changes in political communication across different political periods and relevant political events.
 
 The precise temporal boundaries will be established as data availability and research questions are further defined.
 
-Project status
+## Project status
 
 Status: Initial development
 
 The project is currently in the corpus-design and data-acquisition stage. The repository structure, data schema, collection procedures, and analytical methodology will evolve as the different sources are evaluated and integrated.
 
-Citation
+## Citation
 
 A formal citation for the dataset, code, and resulting research publications will be added as the project develops.
 
-License
+## License
 
 The licensing of individual components of this repository will be specified according to the nature and provenance of the material. Source data may be subject to separate terms and restrictions.
