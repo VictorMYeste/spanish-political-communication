@@ -78,6 +78,7 @@ The intended corpus will preserve information about both the content and provena
 
 A conceptual representation is:
 
+```
 Political actor
     │
     ├── Social media
@@ -88,6 +89,7 @@ Political actor
     │
     └── Media
            └── Interviews / appearances
+```
 
 Each document should retain, where available, metadata such as:
 
