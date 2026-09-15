@@ -1,0 +1,32 @@
+[
+  {
+    "actor_id": "pedro_sanchez",
+    "display_name": "Pedro Sánchez",
+    "congreso_name": "Sánchez Pérez-Castejón, Pedro",
+    "marker_aliases": [
+      "Sánchez Pérez-Castejón",
+      "Sánchez"
+    ],
+    "party": "PSOE"
+  },
+  {
+    "actor_id": "alberto_nunez_feijoo",
+    "display_name": "Alberto Núñez Feijóo",
+    "congreso_name": "Núñez Feijóo, Alberto",
+    "marker_aliases": [
+      "Núñez Feijóo",
+      "Feijóo"
+    ],
+    "party": "PP"
+  },
+  {
+    "actor_id": "santiago_abascal",
+    "display_name": "Santiago Abascal",
+    "congreso_name": "Abascal Conde, Santiago",
+    "marker_aliases": [
+      "Abascal Conde",
+      "Abascal"
+    ],
+    "party": "VOX"
+  }
+]
