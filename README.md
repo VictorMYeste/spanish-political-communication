@@ -1,121 +1,79 @@
 # Spanish Political Communication
 
-Computational research on political communication in Spain, integrating social media posts, parliamentary interventions, media interviews, and other publicly available political discourse.
+Persona-conditioned moral and cultural reception of political messages by the leaders of the main Spanish national parties.
+
+Status: corpus design and data acquisition (September 2026).
 
 ## Overview
 
-This project aims to build a longitudinal, multimodal corpus of political communication produced by three major Spanish political figures:
+This project extends the design of our previous study on Trump's posts (Findings of EMNLP 2026; [code](https://github.com/VictorMYeste/trump-moral-audiences-pipeline)) to three Spanish party leaders in the XV Legislature:
 
-* Pedro Sánchez
-* Santiago Abascal
-* Alberto Núñez Feijóo
+* Pedro Sánchez (PSOE)
+* Alberto Núñez Feijóo (PP)
+* Santiago Abascal (VOX)
 
-The project will collect and analyse publicly available political discourse across different communication environments, with the objective of studying how political actors communicate, frame issues, construct narratives, and employ different forms of political and moral language across contexts.
+Theory-grounded synthetic personas, based on Inglehart–Welzel cultural values and Moral Foundations Theory, evaluate topic-specific bundles of the leaders' messages. They return structured judgments: stance, agreement, legitimacy, offensiveness and endorsement. The results are evaluated at three levels: internal differentiation, explanatory structure and external plausibility against Spanish public-opinion data from the Centro de Investigaciones Sociológicas (CIS).
 
-The initial focus will be on material available from X, parliamentary interventions, and media interviews, although additional sources may be incorporated where they are sufficiently accessible, reliable, and relevant to the research objectives.
+The multi-actor setting adds questions a single-actor study could not address: whether reception follows the message or the speaker, and whether it changes across X posts, parliamentary interventions and media interviews. The general election is expected in early 2027.
 
-## Research objectives
+The full study design, research questions and open decisions are in [docs/PROPOSAL.md](docs/PROPOSAL.md).
 
-The project will investigate, among other aspects:
+## Research questions
 
-* Political framing and the ways political actors present issues, events, groups, and political opponents.
-* Moral language and moral rhetoric, including the use of moral concepts and values in political discourse.
-* Political narratives and recurring rhetorical patterns.
-* Topic and semantic patterns across political actors and communication environments.
-* Temporal changes in political communication.
-* Differences between communication contexts, particularly social media, parliamentary discourse, and traditional media.
-* Differences and similarities between political actors in their communication strategies.
-* The relationship between political events and changes in political discourse.
+* **RQ1.** Do personas selected for different topic-conditioned positions differ in their reception of the same leader's messages?
+* **RQ2.** Which demographic, cultural and moral persona attributes characterise supportive, rejecting and neutral responses?
+* **RQ3.** Do synthetic response distributions align with CIS public-opinion distributions?
+* **RQ4.** How much of the reception depends on the speaker rather than the message?
+* **RQ5.** Does reception differ between X, parliament and media interviews?
 
-The specific research questions and analytical dimensions will be refined as the corpus is constructed and the available data are assessed.
+## Sources
 
-## Data sources
+| Source | Status | Documentation |
+| --- | --- | --- |
+| X posts | Access check available; collection pending pay-per-use enrolment | [docs/X_SCRIPTS.md](docs/X_SCRIPTS.md) |
+| Congreso de los Diputados interventions | Collection and text extraction pipeline available | [docs/CONGRESO_SCRIPTS.md](docs/CONGRESO_SCRIPTS.md), [docs/CONGRESO_RESULTS.md](docs/CONGRESO_RESULTS.md) |
+| Media interviews | Planned as a secondary corpus for robustness checks | [docs/PROPOSAL.md](docs/PROPOSAL.md) |
 
-The project will prioritize publicly available sources, including:
+All sources share the actor identifiers in `config/politicians.json` and the table formats in [docs/DATA_DICTIONARY.md](docs/DATA_DICTIONARY.md).
 
-### X
-
-Posts published by the official accounts associated with the three selected political figures, subject to the availability and applicable terms of the relevant APIs and data-access mechanisms.
-
-### Parliamentary interventions
-
-Publicly available interventions in the Spanish parliamentary context, including relevant speeches, debates, questions, replies, and other parliamentary contributions where structured or reliable source data are available.
-
-### Media interviews
-
-Interviews and other relevant appearances in publicly accessible media sources, subject to availability, licensing, accessibility, and the possibility of reliably obtaining and processing the underlying textual material.
-
-### Additional sources
-
-Other sources may be incorporated when they provide relevant, publicly available material that contributes to the longitudinal analysis of political communication.
-
-All sources will be documented to facilitate reproducibility and provenance tracking.
-
-## Methodology
-
-The project will use methods from Natural Language Processing (NLP) and computational social science.
-
-Potential analytical approaches include:
-
-* Text preprocessing and normalization
-* Topic modelling and topic classification
-* Supervised and weakly supervised text classification
-* Framing analysis
-* Moral language and moral foundations analysis
-* Sentiment and emotion analysis
-* Semantic similarity and embedding-based analysis
-* Narrative analysis
-* Temporal analysis
-* Comparative analysis between political actors and communication contexts
-* Manual annotation and validation of computational models
-* Large Language Model (LLM)-assisted annotation and analysis where appropriate
-
-Automated analyses will be evaluated against manually annotated samples whenever appropriate.
-
-## Corpus structure
-
-The intended corpus will preserve information about both the content and provenance of each document.
-
-A conceptual representation is:
+## Repository layout
 
 ```
-Political actor
-    │
-    ├── Social media
-    │      └── X posts
-    │
-    ├── Parliament
-    │      └── Parliamentary interventions
-    │
-    └── Media
-           └── Interviews / appearances
+config/   politicians.json    actor registry shared by all sources
+          x_accounts.json     X handles and user IDs, joined by actor_id
+          x_collection.json   X collection window, query and fields
+src/      collect_congreso.py, extract_congreso_text.py, check_x_access.py
+tests/    pytest tests, no network access
+docs/     proposal, data dictionary and per-source documentation
+data/     generated locally and never committed (raw/, processed/, cache/)
 ```
 
-Each document should retain, where available, metadata such as:
-
-* Political actor
-* Date and time
-* Source/platform
-* Document type
-* Original URL or source identifier
-* Text
-* Event/context
-* Language
-* Relevant metadata
-* Data collection date
-* Provenance information
-
-The exact schema will evolve as the different data sources are integrated.
-
-## Congreso de los Diputados data pipeline
-
-The repository includes a collection pipeline for the official Congreso de los Diputados Open Data catalogue. It discovers the current chronological JSON snapshot, verifies it with a SHA-256 checksum, filters the three target politicians, preserves source provenance, and optionally extracts speaker turns from the linked official *Diario de Sesiones* pages.
+## Setup
 
 ```bash
 python -m venv .venv
 source .venv/bin/activate
-pip install -r requirements.txt
+python -m pip install -r requirements.txt
+python -m pytest
+```
 
+X credentials are only needed for the X scripts. Copy `.env.example` to `.env` and fill in `X_BEARER_TOKEN`; `.env` is ignored by git.
+
+## X
+
+Check whether the credentials can read public data with the X API v2:
+
+```bash
+python src/check_x_access.py
+```
+
+The collection script, costs and data handling are described in [docs/X_SCRIPTS.md](docs/X_SCRIPTS.md).
+
+## Congreso de los Diputados
+
+The pipeline downloads the official Open Data chronological JSON snapshot, verifies it with a SHA-256 checksum, filters the target politicians and extracts their speaker turns from the linked *Diario de Sesiones* pages.
+
+```bash
 python src/collect_congreso.py \
   --config config/politicians.json \
   --output-dir data \
@@ -129,65 +87,34 @@ python src/extract_congreso_text.py \
   --contact-email YOUR_INSTITUTIONAL_EMAIL
 ```
 
-For a small end-to-end test, add `--max-documents 3` to the second command. The collection writes internal provenance-rich records separately from a blinded stimulus table intended for downstream persona experiments. `keep_for_prompt` defaults to `false` pending substantive sampling and manual quality checks.
+For a small end-to-end test, add `--max-documents 3` to the second command. `keep_for_prompt` defaults to `false` pending sampling and manual quality checks.
 
-See [congreso results and methodological cautions](docs/CONGRESO_RESULTS.md) and the [media-source and rights audit](docs/MEDIA_SOURCES.md). Generated data, downloaded pages, and caches are excluded from version control; the repository contains code and documentation only.
-
-The official source and reuse conditions should be rechecked at collection time:
+Recheck the official source and reuse conditions at collection time:
 
 * [Congreso Open Data — interventions](https://www.congreso.es/es/opendata/intervenciones)
 * [Congreso legal and reuse notice](https://www.congreso.es/es/cem/aviso-legal)
 
+## Data handling and ethics
 
+* The repository contains code, configuration and documentation only. Collected data, caches and credentials are never committed.
+* Each source produces an internal table with full provenance and a stimuli table for the persona experiments. Stimuli are pseudonymised, not anonymous, because the original text remains searchable.
+* X data is collected only through the official API. Only post IDs and derived labels may be shared.
+* Congreso material is used under its reuse conditions. Interview material is processed for research and not redistributed.
+* Politicians' public statements are still personal data under the GDPR. They are processed for academic, non-commercial research only.
+* Persona positions are selection criteria, not claims about real voters or party electorates.
 
-## Reproducibility
+## Contributing
 
-The repository is intended to support reproducible computational research.
-
-Code will be organized into components for:
-
-1. Data collection
-2. Data validation and provenance
-3. Preprocessing
-4. Corpus construction
-5. Annotation
-6. NLP analysis
-7. Statistical analysis
-8. Visualization
-9. Research outputs
-
-Raw data will only be stored or redistributed when permitted by the terms applicable to the corresponding source. Where redistribution of source content is restricted, the repository will prioritize reproducible code, derived data where permissible, document identifiers, metadata, and procedures for reconstructing the corpus.
-
-## Ethical and legal considerations
-
-The project focuses primarily on public political communication produced by public political figures.
-
-The research is intended for academic, non-commercial purposes. Data collection and analysis will be conducted in accordance with:
-
-* Applicable data protection legislation
-* Institutional research ethics requirements
-* Terms of service and API policies of individual platforms
-* Copyright and database-rights requirements
-* Applicable restrictions concerning the storage and redistribution of source material
-
-The project does not aim to profile individual members of the public or infer sensitive personal characteristics from private individuals.
-
-## Research scope
-
-The initial corpus will focus on Pedro Sánchez, Santiago Abascal, and Alberto Núñez Feijóo. The temporal scope is expected to be longitudinal, allowing the analysis of changes in political communication across different political periods and relevant political events.
-
-The precise temporal boundaries will be established as data availability and research questions are further defined.
-
-## Project status
-
-Status: Initial development
-
-The project is currently in the corpus-design and data-acquisition stage. The repository structure, data schema, collection procedures, and analytical methodology will evolve as the different sources are evaluated and integrated.
+* Create one branch per task from an up-to-date `main` and open a pull request; the other team member reviews before merging.
+* Keep changes to shared files (`README.md`, `.gitignore`, `requirements.txt`, `config/politicians.json`, `docs/PROPOSAL.md`, `docs/DATA_DICTIONARY.md`) in small, separate pull requests.
+* Run `python -m pytest` before opening a pull request.
 
 ## Citation
 
-A formal citation for the dataset, code, and resulting research publications will be added as the project develops.
+A citation for this project will be added when a preprint is available. Previous study:
+
+> Candida Maria Greco, Víctor Yeste, Andrea Tagarelli, and Paolo Rosso. 2026. "My own morality, my own mind": Persona-Conditioned Moral and Cultural Reception on Trump Messages. In *Findings of the Association for Computational Linguistics: EMNLP 2026*.
 
 ## License
 
-The licensing of individual components of this repository will be specified according to the nature and provenance of the material. Source data may be subject to separate terms and restrictions.
+The code and documentation in this repository are released under the [Apache License 2.0](LICENSE). Source data are not included and remain subject to their own terms.
