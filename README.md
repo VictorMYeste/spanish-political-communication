@@ -107,6 +107,39 @@ Each document should retain, where available, metadata such as:
 
 The exact schema will evolve as the different data sources are integrated.
 
+## Congreso de los Diputados data pipeline
+
+The repository includes a collection pipeline for the official Congreso de los Diputados Open Data catalogue. It discovers the current chronological JSON snapshot, verifies it with a SHA-256 checksum, filters the three target politicians, preserves source provenance, and optionally extracts speaker turns from the linked official *Diario de Sesiones* pages.
+
+```bash
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+
+python src/collect_congreso.py \
+  --config config/politicians.json \
+  --output-dir data \
+  --contact-email YOUR_INSTITUTIONAL_EMAIL
+
+python src/extract_congreso_text.py \
+  --inventory data/processed/congreso_interventions.csv \
+  --config config/politicians.json \
+  --output-dir data/processed \
+  --cache-dir data/cache/congreso_text \
+  --contact-email YOUR_INSTITUTIONAL_EMAIL
+```
+
+For a small end-to-end test, add `--max-documents 3` to the second command. The collection writes internal provenance-rich records separately from a blinded stimulus table intended for downstream persona experiments. `keep_for_prompt` defaults to `false` pending substantive sampling and manual quality checks.
+
+See [congreso results and methodological cautions](docs/CONGRESO_RESULTS.md) and the [media-source and rights audit](docs/MEDIA_SOURCES.md). Generated data, downloaded pages, and caches are excluded from version control; the repository contains code and documentation only.
+
+The official source and reuse conditions should be rechecked at collection time:
+
+* [Congreso Open Data — interventions](https://www.congreso.es/es/opendata/intervenciones)
+* [Congreso legal and reuse notice](https://www.congreso.es/es/cem/aviso-legal)
+
+
+
 ## Reproducibility
 
 The repository is intended to support reproducible computational research.
