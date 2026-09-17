@@ -1,0 +1,26 @@
+{
+  "collection_start": "2022-04-01T00:00:00Z",
+  "collection_end": null,
+  "analysis_window_start": "2023-08-17",
+  "query_template": "from:{x_user_id} -is:retweet",
+  "time_slice": "month",
+  "max_results": 500,
+  "tweet_fields": [
+    "attachments",
+    "author_id",
+    "conversation_id",
+    "created_at",
+    "edit_history_tweet_ids",
+    "entities",
+    "in_reply_to_user_id",
+    "lang",
+    "note_tweet",
+    "possibly_sensitive",
+    "public_metrics",
+    "referenced_tweets",
+    "reply_settings"
+  ],
+  "expand_referenced_posts": false,
+  "raw_dir": "data/raw/x",
+  "processed_dir": "data/processed"
+}
