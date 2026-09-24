@@ -1,0 +1,95 @@
+{
+  "version": 1,
+  "default_start_date": "2023-07-23",
+  "default_end_date": null,
+  "default_delay_seconds": 2.0,
+  "tracking_query_parameters": [
+    "fbclid",
+    "gclid",
+    "mc_cid",
+    "mc_eid",
+    "utm_campaign",
+    "utm_content",
+    "utm_medium",
+    "utm_source",
+    "utm_term"
+  ],
+  "sources": [
+    {
+      "source_id": "lamoncloa_president_interventions",
+      "source_name": "La Moncloa - Intervenciones del presidente",
+      "publisher": "La Moncloa",
+      "publisher_type": "government",
+      "expected_actor_id": "pedro_sanchez",
+      "adapter": "lamoncloa",
+      "enabled": true,
+      "allowed_hosts": [
+        "lamoncloa.gob.es",
+        "www.lamoncloa.gob.es"
+      ],
+      "detail_url_pattern": "(?i)^https://www\\.lamoncloa\\.gob\\.es/presidente/intervenciones/paginas/.+\\.aspx(?:\\?.*)?$",
+      "discovery": {
+        "type": "aspnet_monthly",
+        "url": "https://www.lamoncloa.gob.es/presidente/intervenciones/paginas/index.aspx",
+        "start_month": "2018-06",
+        "month_select_id": "ddlMonth",
+        "year_select_id": "ddlYear",
+        "submit_id": "btnSearch",
+        "result_selector": "li.advanced-new",
+        "link_selector": "p.title-advanced-news > a",
+        "date_selector": "p.sitedate > span.date"
+      },
+      "selectors": {
+        "title": [
+          "h1#ctl00_PlaceHolderMain_DisplayMode_noticia_h1Title",
+          "h1"
+        ],
+        "date": [
+          "#noticia_sitedate span.date",
+          "time[datetime]"
+        ],
+        "location": [
+          "p#ctl00_PlaceHolderMain_DisplayMode_noticia_pLocationYellowContain.news-location",
+          "p.news-location"
+        ],
+        "body": [
+          "section#contentArticleBody[property='articleBody']",
+          "section#contentArticleBody"
+        ],
+        "remove": [
+          "script",
+          "style",
+          "noscript",
+          "nav",
+          "footer",
+          ".social-media-links",
+          ".rrss"
+        ]
+      },
+      "full_text_markers": [
+        "transcripción",
+        "discurso",
+        "intervención íntegra",
+        "texto íntegro"
+      ],
+      "exclude_document_types": [
+        "parliamentary"
+      ],
+      "legal_notice_url": "https://www.lamoncloa.gob.es/Paginas/es_AvisoLegal.aspx",
+      "required_attribution": "Origen de los datos: sitio web de lamoncloa.gob.es. Ministerio de la Presidencia.",
+      "actor_scope_start_date": "2018-06-02",
+      "actor_scope_end_date": null,
+      "redistribution_status": "internal_research_only_pending_review",
+      "store_text_internal": true,
+      "actor_verified_by_source_scope": true,
+      "monologue_document_types": [
+        "speech",
+        "statement",
+        "article"
+      ],
+      "default_document_status": "included",
+      "default_status": "included",
+      "require_actor_in_hint": false
+    }
+  ]
+}
