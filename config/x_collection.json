@@ -20,7 +20,7 @@
     "referenced_tweets",
     "reply_settings"
   ],
-  "expand_referenced_posts": false,
+  "expand_referenced_posts": true,
   "raw_dir": "data/raw/x",
   "processed_dir": "data/processed"
 }

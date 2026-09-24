@@ -23,6 +23,7 @@ One per source, with full identity and provenance. For research use only.
 
 | Column | Description |
 | --- | --- |
+| `bundle_id` | Bundle identifier, empty until bundling |
 | `message_id` | Stable identifier, unique across sources (see prefixes below) |
 | `actor_id` | Actor identifier from the registry |
 | `actor_name` | Display name |
@@ -44,17 +45,19 @@ One per source, with full identity and provenance. For research use only.
 
 `bundle_id`, `turn_index`, `segment_index`, `speaker_header`, `source_cve`, `text_url`, `pdf_url`. See `docs/CONGRESO_SCRIPTS.md`.
 
-### X-specific columns (proposed)
+### X-specific columns
 
-Output file: `data/processed/x_posts_internal.csv`.
+Output file: `data/processed/x_posts_internal.csv`, written by `src/build_x_tables.py`.
 
 | Column | Description |
 | --- | --- |
 | `post_id` | X post ID |
 | `x_user_id` | Author account ID |
 | `created_at_utc` | Post timestamp from the API (UTC) |
-| `post_type` | `original`, `reply` or `quote`, derived from `referenced_tweets` |
+| `post_type` | `original`, `reply` or `quote`, derived from `referenced_tweets`; a reply that also quotes counts as `quote` |
 | `referenced_post_id` | Replied-to or quoted post ID, if any |
+| `referenced_post_author_id` | Author of the referenced post |
+| `referenced_post_text` | Text of the referenced post, collected as an expansion so that short posts can be read in context |
 | `in_reply_to_user_id` | Author of the replied-to post, if any |
 | `conversation_id` | Thread identifier |
 | `lang` | Language detected by X |
