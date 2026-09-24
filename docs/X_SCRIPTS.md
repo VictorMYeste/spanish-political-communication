@@ -61,20 +61,47 @@ The script prints the HTTP status, the access status, rate-limit headers and err
 | `usage-capped` | Monthly cap or spending limit reached | Wait for the next cycle or raise the limit |
 | `rate-limited` | Too many requests | Wait for `x-rate-limit-reset` |
 
-## 2. Collect posts (planned)
+## 2. Collect posts
 
-`src/collect_x.py` will:
+`src/collect_x.py` counts first and downloads afterwards, so the cost is known before anything is collected.
 
-1. read `config/x_accounts.json` and `config/x_collection.json`;
-2. request monthly counts (`/2/tweets/counts/all`) per actor and print the expected cost before collecting;
-3. run full-archive search month by month with `from:<x_user_id> -is:retweet` and the fields in `x_collection.json`, including `note_tweet`, without which long posts are truncated;
-4. store each response page untouched in `data/raw/x/<actor_id>/<YYYY-MM>.jsonl` and log every request in `data/raw/x/manifest.jsonl`;
-5. skip months that are already complete, so interrupted runs can resume;
-6. compare collected totals with the counts and report gaps.
+```bash
+python src/collect_x.py --counts-only   # how many posts and what it would cost
+python src/collect_x.py                 # counts, asks for confirmation, then downloads
+```
 
-A later script will build `data/processed/x_posts_internal.csv` and `data/processed/x_stimuli.csv` with the columns in `docs/DATA_DICTIONARY.md`.
+The script reads `config/x_accounts.json` and `config/x_collection.json` and, for each actor and month:
 
-Replies and quote posts are collected and marked with `post_type`; whether they enter the stimuli is decided at preprocessing. Expanding referenced posts (`expand_referenced_posts`) is off by default because each expanded post may be billed as an extra read.
+1. requests full-archive counts for `from:<x_user_id> -is:retweet` ($0.010 per request) and prints the totals per actor and the expected download cost;
+2. after confirmation, runs full-archive search with the fields in `x_collection.json`, including `note_tweet`, without which long posts are truncated;
+3. writes each response page untouched to `data/raw/x/<actor_id>/<YYYY-MM>.jsonl`;
+4. logs every request in `data/raw/x/manifest.jsonl` and marks each finished month, so an interrupted run resumes where it stopped;
+5. reports any month whose collected total differs from its count.
+
+Useful options:
+
+* `--counts-only`: count and estimate, download nothing.
+* `--yes`: skip the confirmation, for scheduled runs.
+* `--max-cost 50`: stop if the estimate is above that many dollars.
+* `--actor pedro_sanchez`: one actor; repeatable.
+* `--start 2023-08-17` / `--end 2024-01-01`: override the configured window.
+* `--force`: collect months that are already marked complete again (they are charged again unless collected the same UTC day).
+
+Retweets are excluded by the query, so they are never downloaded or paid for. Replies and quote posts are collected and marked with `post_type`. Since `expand_referenced_posts` is enabled, the quoted or replied-to post is requested alongside, so short posts such as "Vergonzoso." keep their context; each referenced post is an extra read.
+
+## 3. Build the tables
+
+```bash
+python src/build_x_tables.py
+```
+
+Reads the raw pages, removes duplicates and writes, with the columns in [DATA_DICTIONARY.md](DATA_DICTIONARY.md):
+
+* `data/processed/x_posts_internal.csv`: full provenance, including the text of referenced posts;
+* `data/processed/x_stimuli.csv`: same columns as the Congreso stimuli table;
+* `data/processed/x_build_summary.json`: counts by actor and post type, duplicates, date range, and references whose text is missing.
+
+`text_anon` holds the original text at this stage; anonymization is applied in a later preprocessing step, which also decides whether referenced-post context reaches the prompts and sets `keep_for_prompt`.
 
 ## Data handling
 

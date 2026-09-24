@@ -42,7 +42,8 @@ All sources share the actor identifiers in `config/politicians.json` and the tab
 config/   politicians.json    actor registry shared by all sources
           x_accounts.json     X handles and user IDs, joined by actor_id
           x_collection.json   X collection window, query and fields
-src/      collect_congreso.py, extract_congreso_text.py, check_x_access.py
+src/      check_x_access.py, collect_x.py, build_x_tables.py
+          collect_congreso.py, extract_congreso_text.py
 tests/    pytest tests, no network access
 docs/     proposal, data dictionary and per-source documentation
 data/     generated locally and never committed (raw/, processed/, cache/)
@@ -61,13 +62,16 @@ X credentials are only needed for the X scripts. Copy `.env.example` to `.env` a
 
 ## X
 
-Check whether the credentials can read public data with the X API v2:
+Posts written by the leaders are collected with full-archive search, excluding retweets. The collector counts the matching posts and prints the cost before downloading anything.
 
 ```bash
-python src/check_x_access.py
+python src/check_x_access.py --write-ids   # check access, resolve account IDs
+python src/collect_x.py --counts-only      # how many posts and what they would cost
+python src/collect_x.py                    # counts, confirms, then downloads
+python src/build_x_tables.py               # internal and stimuli tables
 ```
 
-The collection script, costs and data handling are described in [docs/X_SCRIPTS.md](docs/X_SCRIPTS.md).
+Costs, options and data handling are described in [docs/X_SCRIPTS.md](docs/X_SCRIPTS.md).
 
 ## Congreso de los Diputados
 
