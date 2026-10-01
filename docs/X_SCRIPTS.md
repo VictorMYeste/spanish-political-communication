@@ -81,8 +81,9 @@ The script reads `config/x_accounts.json` and `config/x_collection.json` and, fo
 Useful options:
 
 * `--counts-only`: count and estimate, download nothing.
+* `--skip-counts`: download straight away, without counting first. Saves $0.010 per month on repeat runs, for example the weekly updates, at the price of having no estimate beforehand and no check of collected totals against counts. Combine it with `--max-cost`.
 * `--yes`: skip the confirmation, for scheduled runs.
-* `--max-cost 50`: stop if the estimate is above that many dollars.
+* `--max-cost 50`: stop before the estimate, or the running cost of the download, goes above that many dollars. A month interrupted this way is not marked complete and is collected again on the next run, so its pages are paid for twice unless the rerun happens on the same UTC day.
 * `--actor pedro_sanchez`: one actor; repeatable.
 * `--start 2023-08-17` / `--end 2024-01-01`: override the configured window.
 * `--force`: collect months that are already marked complete again (they are charged again unless collected the same UTC day).

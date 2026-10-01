@@ -50,6 +50,10 @@ class AccessError(RuntimeError):
     """The API refused the request for credentials, enrolment or billing."""
 
 
+class BudgetExceeded(RuntimeError):
+    """The run reached the cost limit given with --max-cost."""
+
+
 def month_slices(
     start: datetime, end: datetime
 ) -> List[Tuple[str, datetime, datetime]]:
@@ -109,13 +113,41 @@ def append_manifest(path: Path, record: Mapping[str, object]) -> None:
 class Client:
     """Minimal X API client with rate-limit handling and request logging."""
 
-    def __init__(self, token: str, manifest_path: Path, timeout: float = 60.0):
+    def __init__(
+        self,
+        token: str,
+        manifest_path: Path,
+        timeout: float = 60.0,
+        max_cost: Optional[float] = None,
+    ):
         self.token = token
         self.manifest_path = manifest_path
         self.timeout = timeout
+        self.max_cost = max_cost
         self.session = requests.Session()
         self.last_request = 0.0
         self.requests_made = 0
+        self.counts_requests = 0
+        self.posts_read = 0
+
+    def _account_for(self, path: str, payload: Mapping[str, object]) -> None:
+        """Count the billable resources of a successful response."""
+        if path.endswith("/counts/all"):
+            self.counts_requests += 1
+        elif path.endswith("/search/all"):
+            includes = payload.get("includes") or {}
+            self.posts_read += len(payload.get("data") or [])
+            self.posts_read += len(includes.get("tweets") or [])
+
+    def cost(self) -> float:
+        """Approximate dollars spent so far, before same-day deduplication."""
+        return (
+            self.posts_read * PRICE_PER_POST
+            + self.counts_requests * PRICE_PER_COUNTS_REQUEST
+        )
+
+    def over_budget(self) -> bool:
+        return self.max_cost is not None and self.cost() > self.max_cost
 
     def _wait_turn(self) -> None:
         elapsed = time.monotonic() - self.last_request
@@ -155,6 +187,7 @@ class Client:
                 },
             )
             if response.status_code == 200:
+                self._account_for(path, payload)
                 return payload
             access = classify_response(response.status_code, payload)
             if access in {"invalid-credentials", "not-enrolled", "no-credits", "usage-capped"}:
@@ -223,6 +256,10 @@ def collect_month(
             pages += 1
             posts += len(payload.get("data", []) or [])
             referenced += len(((payload.get("includes", {}) or {}).get("tweets", []) or []))
+            if client.over_budget():
+                raise BudgetExceeded(
+                    f"spent about ${client.cost():.2f}, above the --max-cost limit"
+                )
             token = (payload.get("meta", {}) or {}).get("next_token")
             if not token:
                 return posts, referenced, pages
@@ -248,8 +285,18 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--start", help="Overrides collection_start (YYYY-MM-DD).")
     parser.add_argument("--end", help="Overrides collection_end (YYYY-MM-DD).")
     parser.add_argument("--counts-only", action="store_true", help="Only count and estimate the cost.")
+    parser.add_argument(
+        "--skip-counts",
+        action="store_true",
+        help="Download without counting first, saving $0.010 per month already counted.",
+    )
     parser.add_argument("--yes", action="store_true", help="Do not ask for confirmation before downloading.")
-    parser.add_argument("--max-cost", type=float, default=None, help="Abort if the estimate exceeds this many dollars.")
+    parser.add_argument(
+        "--max-cost",
+        type=float,
+        default=None,
+        help="Stop before the estimate, or the running cost, exceeds this many dollars.",
+    )
     parser.add_argument("--force", action="store_true", help="Collect months already marked complete again.")
     parser.add_argument("--timeout", type=float, default=60.0)
     return parser.parse_args()
@@ -257,6 +304,9 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> int:
     args = parse_args()
+    if args.counts_only and args.skip_counts:
+        print("--counts-only and --skip-counts cannot be used together.")
+        return 2
     settings = json.loads(args.config.read_text(encoding="utf-8"))
     accounts = load_accounts(args.accounts)
     if args.actor:
@@ -285,7 +335,7 @@ def main() -> int:
     raw_dir = args.raw_dir or (ROOT / str(settings.get("raw_dir", "data/raw/x")))
     manifest_path = raw_dir / "manifest.jsonl"
     completed = {} if args.force else load_manifest(manifest_path)
-    client = Client(token, manifest_path, timeout=args.timeout)
+    client = Client(token, manifest_path, timeout=args.timeout, max_cost=args.max_cost)
 
     pending: List[Tuple[Dict[str, object], str, datetime, datetime]] = []
     skipped = 0
@@ -299,39 +349,47 @@ def main() -> int:
     if not pending:
         return 0
 
-    print("\nCounting posts (full-archive counts, $0.010 per request)...")
     counts: Dict[Tuple[str, str], int] = {}
-    try:
-        for account, label, slice_start, slice_end in pending:
-            query = build_query(str(settings["query_template"]), str(account["x_user_id"]))
-            context = {"actor_id": account["actor_id"], "month": label, "query": query}
-            total = count_month(client, query, slice_start, slice_end, context)
-            counts[(str(account["actor_id"]), label)] = total
-            print(f"  {account['actor_id']:>22} {label}: {total:>5} posts")
-    except AccessError as error:
-        print(f"\nAccess error: {error}")
-        return 1
+    if args.skip_counts:
+        print("\nSkipping the counting phase: the cost is not known in advance.")
+    else:
+        print("\nCounting posts (full-archive counts, $0.010 per request)...")
+        try:
+            for account, label, slice_start, slice_end in pending:
+                query = build_query(str(settings["query_template"]), str(account["x_user_id"]))
+                context = {"actor_id": account["actor_id"], "month": label, "query": query}
+                total = count_month(client, query, slice_start, slice_end, context)
+                counts[(str(account["actor_id"]), label)] = total
+                print(f"  {account['actor_id']:>22} {label}: {total:>5} posts")
+        except AccessError as error:
+            print(f"\nAccess error: {error}")
+            return 1
 
-    total_posts = sum(counts.values())
-    by_actor: Dict[str, int] = {}
-    for (actor_id, _), value in counts.items():
-        by_actor[actor_id] = by_actor.get(actor_id, 0) + value
-    counts_cost = client.requests_made * PRICE_PER_COUNTS_REQUEST
-    posts_cost = total_posts * PRICE_PER_POST
-    print("\nPosts by actor:")
-    for actor_id, value in sorted(by_actor.items()):
-        print(f"  {actor_id:>22}: {value:>6}")
-    print(f"\nTotal posts: {total_posts}")
-    print(f"Counts requests so far: {client.requests_made} (${counts_cost:.2f})")
-    print(f"Estimated download cost: ${posts_cost:.2f} (referenced posts are extra)")
+        total_posts = sum(counts.values())
+        by_actor: Dict[str, int] = {}
+        for (actor_id, _), value in counts.items():
+            by_actor[actor_id] = by_actor.get(actor_id, 0) + value
+        posts_cost = total_posts * PRICE_PER_POST
+        print("\nPosts by actor:")
+        for actor_id, value in sorted(by_actor.items()):
+            print(f"  {actor_id:>22}: {value:>6}")
+        print(f"\nTotal posts: {total_posts}")
+        print(f"Counts requests so far: {client.counts_requests} (${client.cost():.2f})")
+        print(f"Estimated download cost: ${posts_cost:.2f} (referenced posts are extra)")
 
-    if args.counts_only:
-        return 0
-    if args.max_cost is not None and posts_cost > args.max_cost:
-        print(f"Estimate above --max-cost (${args.max_cost:.2f}). Nothing was downloaded.")
-        return 1
+        if args.counts_only:
+            return 0
+        if args.max_cost is not None and client.cost() + posts_cost > args.max_cost:
+            print(f"Estimate above --max-cost (${args.max_cost:.2f}). Nothing was downloaded.")
+            return 1
+
     if not args.yes:
-        answer = input("\nDownload these posts? [y/N] ").strip().lower()
+        question = (
+            "\nDownload these posts? [y/N] "
+            if counts
+            else "\nDownload without a cost estimate? [y/N] "
+        )
+        answer = input(question).strip().lower()
         if answer not in {"y", "yes"}:
             print("Cancelled. Nothing was downloaded.")
             return 1
@@ -347,8 +405,11 @@ def main() -> int:
             posts, referenced, pages = collect_month(
                 client, query, slice_start, slice_end, settings, out_file, context
             )
-            expected = counts.get((actor_id, label), 0)
-            status = "ok" if posts == expected else f"expected {expected}"
+            expected = counts.get((actor_id, label))
+            if expected is None:
+                status = "not counted"
+            else:
+                status = "ok" if posts == expected else f"expected {expected}"
             print(f"  {actor_id:>22} {label}: {posts:>5} posts, {referenced:>4} referenced, {pages} page(s) ({status})")
             collected_posts += posts
             collected_referenced += referenced
@@ -369,14 +430,15 @@ def main() -> int:
                     "finished_at_utc": datetime.now(timezone.utc).isoformat(),
                 },
             )
-    except AccessError as error:
-        print(f"\nAccess error: {error}")
+    except (AccessError, BudgetExceeded) as error:
+        label = "Access error" if isinstance(error, AccessError) else "Cost limit reached"
+        print(f"\n{label}: {error}")
         print("Months already finished are marked complete and will be skipped on the next run.")
+        print(f"Approximate cost so far: ${client.cost():.2f}")
         return 1
 
-    reads = collected_posts + collected_referenced
     print(f"\nCollected {collected_posts} posts and {collected_referenced} referenced posts.")
-    print(f"Approximate cost: ${reads * PRICE_PER_POST + counts_cost:.2f} (before same-day deduplication).")
+    print(f"Approximate cost: ${client.cost():.2f} (before same-day deduplication).")
     print(f"Raw pages in {raw_dir}, manifest in {manifest_path}.")
     return 0
 
