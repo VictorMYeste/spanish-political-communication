@@ -131,6 +131,36 @@ def test_collect_month_rewrites_file_when_run_again(tmp_path, monkeypatch):
     assert "stale" not in out_file.read_text(encoding="utf-8")
 
 
+def test_cost_counts_posts_referenced_posts_and_counts_requests(tmp_path, monkeypatch):
+    responses = [
+        FakeResponse(200, {"meta": {"total_tweet_count": 10}}),
+        FakeResponse(200, {"data": [{"id": "1"}, {"id": "2"}], "includes": {"tweets": [{"id": "9"}]}}),
+    ]
+    client = make_client(tmp_path, responses, monkeypatch)
+    client.get("/tweets/counts/all", {}, {})
+    client.get("/tweets/search/all", {}, {})
+    assert client.counts_requests == 1
+    assert client.posts_read == 3
+    assert client.cost() == pytest.approx(0.010 + 3 * 0.005)
+    assert client.over_budget() is False
+
+
+def test_collect_month_stops_when_over_budget(tmp_path, monkeypatch):
+    responses = [
+        FakeResponse(200, {"data": [{"id": "1"}, {"id": "2"}], "meta": {"next_token": "t1"}}),
+        FakeResponse(200, {"data": [{"id": "3"}], "meta": {"next_token": "t2"}}),
+    ]
+    client = make_client(tmp_path, responses, monkeypatch)
+    client.max_cost = 0.011  # covers two posts, not three
+    out_file = tmp_path / "raw" / "2024-01.jsonl"
+    with pytest.raises(collect.BudgetExceeded):
+        collect.collect_month(
+            client, "q", utc("2024-01-01T00:00:00"), utc("2024-02-01T00:00:00"), {"tweet_fields": []}, out_file, {}
+        )
+    # Pages already paid for are kept, so the data is not lost.
+    assert len(out_file.read_text(encoding="utf-8").strip().splitlines()) == 2
+
+
 def test_access_errors_stop_the_run(tmp_path, monkeypatch):
     payload = {"title": "Client Forbidden", "reason": "client-not-enrolled"}
     client = make_client(tmp_path, [FakeResponse(403, payload)], monkeypatch)
