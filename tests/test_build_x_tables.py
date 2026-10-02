@@ -136,6 +136,26 @@ def test_build_rows_end_to_end(tmp_path):
     assert [row["date"] for row in rows] == ["2024-05-01", "2024-05-02"]
 
 
+def test_posts_containing_unicode_line_separators_are_read(tmp_path):
+    """U+2028 inside post text must not be treated as a line break."""
+    page = {
+        "data": [
+            {
+                "id": "300",
+                "author_id": "1",
+                "created_at": "2024-05-02T09:00:00.000Z",
+                "text": "Primera línea segunda línea",
+            },
+            {"id": "301", "author_id": "1", "created_at": "2024-05-03T09:00:00.000Z", "text": "Normal"},
+        ]
+    }
+    write_raw(tmp_path, "pedro_sanchez", "2024-05", [page])
+    accounts = [{"actor_id": "pedro_sanchez", "x_handle": "sanchezcastejon", "x_user_id": "1"}]
+    rows, summary = build.build_rows(tmp_path, accounts, {})
+    assert summary["posts"] == 2
+    assert " " in rows[0]["text"]
+
+
 def test_missing_referenced_text_is_counted(tmp_path):
     page = {
         "data": [
