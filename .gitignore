@@ -2,6 +2,7 @@
 __pycache__/
 .pytest_cache/
 *.py[cod]
-data/
+data/*
+!data/README.md
 *.part
 .env
