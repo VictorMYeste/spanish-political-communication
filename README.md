@@ -30,7 +30,7 @@ The full study design, research questions and open decisions are in [docs/PROPOS
 
 | Source | Status | Documentation |
 | --- | --- | --- |
-| X posts | Access check available; collection pending pay-per-use enrolment | [docs/X_SCRIPTS.md](docs/X_SCRIPTS.md) |
+| X posts | Collected: 10,863 posts, 2022-04 to 2026-10 | [docs/X_SCRIPTS.md](docs/X_SCRIPTS.md), [docs/X_RESULTS.md](docs/X_RESULTS.md) |
 | Congreso de los Diputados interventions | Collection and text extraction pipeline available | [docs/CONGRESO_SCRIPTS.md](docs/CONGRESO_SCRIPTS.md), [docs/CONGRESO_RESULTS.md](docs/CONGRESO_RESULTS.md) |
 | Media interviews | Planned as a secondary corpus for robustness checks | [docs/PROPOSAL.md](docs/PROPOSAL.md) |
 

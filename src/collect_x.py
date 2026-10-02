@@ -90,7 +90,9 @@ def load_manifest(path: Path) -> Dict[Tuple[str, str], Dict[str, object]]:
     completed: Dict[Tuple[str, str], Dict[str, object]] = {}
     if not path.exists():
         return completed
-    for line in path.read_text(encoding="utf-8").splitlines():
+    # Split on newlines only: a logged query or text can contain U+2028,
+    # which str.splitlines() would treat as a line break.
+    for line in path.read_text(encoding="utf-8").split("\n"):
         line = line.strip()
         if not line:
             continue
@@ -249,19 +251,25 @@ def collect_month(
         params["expansions"] = "referenced_tweets.id,author_id"
     out_file.parent.mkdir(parents=True, exist_ok=True)
     posts = referenced = pages = 0
+    seen: set = set()
     with out_file.open("w", encoding="utf-8") as handle:
         while True:
             payload = client.get("/tweets/search/all", params, {**context, "phase": "search"})
             handle.write(json.dumps(payload, ensure_ascii=False) + "\n")
             pages += 1
-            posts += len(payload.get("data", []) or [])
+            page_ids = {str(post.get("id")) for post in (payload.get("data") or [])}
+            new_ids = page_ids - seen
+            seen |= page_ids
+            posts += len(new_ids)
             referenced += len(((payload.get("includes", {}) or {}).get("tweets", []) or []))
             if client.over_budget():
                 raise BudgetExceeded(
                     f"spent about ${client.cost():.2f}, above the --max-cost limit"
                 )
             token = (payload.get("meta", {}) or {}).get("next_token")
-            if not token:
+            # The API returns a next_token even on the last page, whose only
+            # content is the post already seen. Stop instead of paying for it.
+            if not token or not new_ids:
                 return posts, referenced, pages
             params = {**params, "next_token": token}
 

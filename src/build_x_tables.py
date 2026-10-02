@@ -91,7 +91,9 @@ def iter_pages(raw_dir: Path, actor_id: str) -> Iterable[Tuple[Path, Dict]]:
     if not actor_dir.is_dir():
         return
     for path in sorted(actor_dir.glob("*.jsonl")):
-        for line in path.read_text(encoding="utf-8").splitlines():
+        # Split on newlines only: post text can contain U+2028, which
+        # str.splitlines() would treat as a line break, cutting a page in two.
+        for line in path.read_text(encoding="utf-8").split("\n"):
             line = line.strip()
             if not line:
                 continue
@@ -163,7 +165,7 @@ def manifest_timestamps(raw_dir: Path) -> Dict[Tuple[str, str], str]:
     stamps: Dict[Tuple[str, str], str] = {}
     if not path.exists():
         return stamps
-    for line in path.read_text(encoding="utf-8").splitlines():
+    for line in path.read_text(encoding="utf-8").split("\n"):
         line = line.strip()
         if not line:
             continue

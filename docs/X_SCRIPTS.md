@@ -104,8 +104,11 @@ Reads the raw pages, removes duplicates and writes, with the columns in [DATA_DI
 
 `text_anon` holds the original text at this stage; anonymization is applied in a later preprocessing step, which also decides whether referenced-post context reaches the prompts and sets `keep_for_prompt`.
 
+The results of the first full collection, including its quality control, are in [X_RESULTS.md](X_RESULTS.md).
+
 ## Data handling
 
-* Deleted or protected posts are not returned by search. Record the collection date and treat the corpus as the set of posts public at that date.
+* Deleted or protected posts are not returned by search. Record the collection date and treat the corpus as the set of posts public at that date. In the first run, 8 of 10,871 counted posts (0.07%) had been deleted between counting and downloading.
+* Stored pages are read by splitting on newlines only, because post text can contain U+2028, which Python's `str.splitlines()` would treat as a line break.
 * Raw responses and processed tables contain full text and are excluded from version control.
 * Only post IDs and derived labels may be shared, following the X developer terms and the project's data-management plan.

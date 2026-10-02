@@ -85,6 +85,14 @@ def test_manifest_round_trip(tmp_path):
     assert collect.load_manifest(tmp_path / "missing.jsonl") == {}
 
 
+def test_manifest_survives_unicode_line_separators(tmp_path):
+    """U+2028 in a logged value must not be treated as a line break."""
+    path = tmp_path / "manifest.jsonl"
+    collect.append_manifest(path, {"type": "request", "note": "a b"})
+    collect.append_manifest(path, {"type": "month_complete", "actor_id": "a", "month": "2024-01"})
+    assert set(collect.load_manifest(path)) == {("a", "2024-01")}
+
+
 def test_count_month_adds_up_pages(tmp_path, monkeypatch):
     responses = [
         FakeResponse(200, {"meta": {"total_tweet_count": 40, "next_token": "t1"}}),
@@ -118,6 +126,22 @@ def test_collect_month_writes_pages_and_follows_tokens(tmp_path, monkeypatch):
     assert first["tweet.fields"] == "created_at,lang"
     assert first["expansions"] == "referenced_tweets.id,author_id"
     assert first["max_results"] == "500"
+
+
+def test_collect_month_stops_when_a_page_adds_nothing(tmp_path, monkeypatch):
+    """The API sends a next_token on the last page; following it only repeats a post."""
+    responses = [
+        FakeResponse(200, {"data": [{"id": "1"}, {"id": "2"}], "meta": {"next_token": "t1"}}),
+        FakeResponse(200, {"data": [{"id": "2"}], "meta": {"next_token": "t2"}}),
+        FakeResponse(200, {"data": [{"id": "3"}], "meta": {}}),
+    ]
+    client = make_client(tmp_path, responses, monkeypatch)
+    posts, _, pages = collect.collect_month(
+        client, "q", utc("2024-01-01T00:00:00"), utc("2024-02-01T00:00:00"),
+        {"tweet_fields": []}, tmp_path / "raw" / "2024-01.jsonl", {},
+    )
+    assert (posts, pages) == (2, 2)
+    assert len(client.session.responses) == 1  # the third request was never sent
 
 
 def test_collect_month_rewrites_file_when_run_again(tmp_path, monkeypatch):
