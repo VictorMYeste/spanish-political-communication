@@ -1,0 +1,63 @@
+# Research data: Spanish Political Communication
+
+Working data for the project [spanish-political-communication](https://github.com/VictorMYeste/spanish-political-communication). **Not public. Do not redistribute.**
+
+| | |
+| --- | --- |
+| Project | Persona-conditioned moral and cultural reception of Spanish party leaders' messages |
+| Team | Víctor Yeste (UPV), Candida Maria Greco (UNICAL), Paolo Rosso (UPV) |
+| Controller | Universitat Politècnica de València |
+| Contact | vicyesmo@upv.es |
+| Last updated | 2026-10-02 |
+
+## What this is
+
+Public messages by Pedro Sánchez (PSOE), Alberto Núñez Feijóo (PP) and Santiago Abascal (VOX), collected for academic, non-commercial research. The code that produced every file is in the repository; this folder holds only its output.
+
+These are public statements by public figures, but they are still personal data under the GDPR. Keep this folder in institutional storage, share it only with the project team, and do not copy it to personal accounts or public services.
+
+## Contents
+
+```
+raw/        responses exactly as the sources returned them
+  x/        <actor_id>/<YYYY-MM>.jsonl, one API page per line, plus manifest.jsonl
+processed/  tables built from the raw data
+  x_posts_internal.csv   full text and provenance, one row per post
+  x_stimuli.csv          pseudonymised table for the persona experiments
+  x_build_summary.json   counts, date range and quality checks of the build
+```
+
+Folders for the other sources (`raw/congreso/`, `raw/moncloa/`, `cache/`) appear when those pipelines are run.
+
+### X posts
+
+| | |
+| --- | --- |
+| Collected | 2026-10-02 |
+| Window | 2022-04-01 to 2026-10-02 |
+| Query | `from:<user_id> -is:retweet`, so retweets are excluded |
+| Posts | 10,863 (Sánchez 3,902, Feijóo 3,515, Abascal 3,446) |
+| Also stored | 3,032 quoted or replied-to posts, kept so short posts can be read in context |
+| Source | Official X API v2, full-archive search, paid per post |
+
+Details and quality control: `docs/X_RESULTS.md` in the repository. The corpus is the set of posts that were still public on the collection date; deleted posts cannot be retrieved.
+
+## Rules
+
+* **Never commit this folder to git.** The repository ignores `data/`.
+* **Do not redistribute the text.** Only post identifiers and derived labels may be published, in line with the X developer terms and the project's data-management plan.
+* Congreso and La Moncloa material is used under the reuse conditions of each source. Interview material is processed for research only.
+* `x_stimuli.csv` is pseudonymised, not anonymous: the text can still be searched and traced back to its author.
+* Do not use this data to profile private individuals.
+
+## If the data is lost
+
+Everything can be rebuilt from the repository, but re-collecting from X costs money again, about $73 for the window above. Keep a second copy on another disk.
+
+```bash
+python src/check_x_access.py --write-ids
+python src/collect_x.py          # counts, shows the cost, asks, then downloads
+python src/build_x_tables.py     # rebuilds the tables from raw/, free
+```
+
+Rebuilding the tables from `raw/` costs nothing, so the raw pages are the part worth protecting.
