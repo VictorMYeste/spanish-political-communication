@@ -110,9 +110,9 @@ Recheck the official Congreso source and reuse conditions at collection time:
 
 ## Contributing
 
-* Create one branch per task from an up-to-date `main` and open a pull request; the other team member reviews before merging.
-* Keep changes to shared files (`README.md`, `.gitignore`, `requirements.txt`, `config/politicians.json`, `docs/PROPOSAL.md`, `docs/DATA_DICTIONARY.md`) in small, separate pull requests.
-* Run `python -m pytest` before opening a pull request.
+* Create one branch per task from an up-to-date `main`. When it is ready, merge it into `main` with a merge commit (`git merge --no-ff`) and push `main`. Pull requests and reviews are not required.
+* Keep changes to shared files (`README.md`, `.gitignore`, `requirements.txt`, `config/politicians.json`, `docs/PROPOSAL.md`, `docs/DATA_DICTIONARY.md`) small and in separate commits.
+* Run `python -m pytest` before pushing to `main`.
 
 ## Citation
 
