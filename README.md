@@ -2,48 +2,64 @@
 
 Persona-conditioned moral and cultural reception of political messages by the leaders of the main Spanish national parties.
 
-Status: corpus design and data acquisition (September 2026).
+Status: study design agreed on 7 October 2026; corpus preparation for the first paper.
 
 ## Overview
 
-This project extends the design of our previous study on Trump's posts (Findings of EMNLP 2026; [code](https://github.com/VictorMYeste/trump-moral-audiences-pipeline)) to three Spanish party leaders in the XV Legislature:
+This project extends our previous study on Trump's posts (Findings of EMNLP 2026; [code](https://github.com/VictorMYeste/trump-moral-audiences-pipeline)) to three Spanish party leaders in the XV Legislature:
 
 * Pedro Sánchez (PSOE)
 * Alberto Núñez Feijóo (PP)
 * Santiago Abascal (VOX)
 
-Theory-grounded synthetic personas, based on Inglehart–Welzel cultural values and Moral Foundations Theory, evaluate topic-specific bundles of the leaders' messages. They return structured judgments: stance, agreement, legitimacy, offensiveness and endorsement. The results are evaluated at three levels: internal differentiation, explanatory structure and external plausibility against Spanish public-opinion data from the Centro de Investigaciones Sociológicas (CIS).
+The first paper asks whether the speaker's name changes how the same message is judged. Synthetic personas from a culturally grounded persona pool, with Inglehart–Welzel cultural values and Moral Foundations profiles, judge each X post in four conditions: without an author, and attributed to Sánchez, Feijóo or Abascal. The message stays the same; only the name changes. Personas return the same structured judgments as in the previous study: stance, agreement, legitimacy, offensiveness and endorsement.
 
-The multi-actor setting adds questions a single-actor study could not address: whether reception follows the message or the speaker, and whether it changes across X posts, parliamentary interventions and media interviews. The general election is expected in early 2027.
+Before seeing any post, each persona answers the 1–10 left–right self-placement question of the Centro de Investigaciones Sociológicas (CIS). This elicited ideological self-placement is the model's interpretation of the persona, not ground truth. It is used only to form left, centre and right groups and is never shown to the persona when it judges messages. The relative preferences for the three leaders in each group are then compared with those of the corresponding ideological groups in CIS surveys.
 
-The full study design, research questions and open decisions are in [docs/PROPOSAL.md](docs/PROPOSAL.md).
+The first paper uses X posts only. Parliamentary interventions and interviews are left for a follow-up paper. The general election is expected in early 2027.
+
+The full study design and open decisions are in [docs/PROPOSAL.md](docs/PROPOSAL.md).
 
 ## Research questions
 
-* **RQ1.** Do personas selected for different topic-conditioned positions differ in their reception of the same leader's messages?
-* **RQ2.** Which demographic, cultural and moral persona attributes characterise supportive, rejecting and neutral responses?
-* **RQ3.** Do synthetic response distributions align with CIS public-opinion distributions?
-* **RQ4.** How much of the reception depends on the speaker rather than the message?
-* **RQ5.** Does reception differ between X, parliament and media interviews?
+Core of the first paper:
+
+* **RQ1, speaker attribution.** How does attributing the same message to Sánchez, Feijóo or Abascal, rather than presenting it anonymously, change its evaluation by synthetic personas?
+* **RQ2, ideological congruence.** Does the speaker-attribution effect depend on the persona's elicited ideological self-placement? Do personas respond more positively when the attributed speaker is ideologically closer to them?
+* **RQ3, topics.** Does the size or direction of the speaker-attribution effect vary across salient political topics, such as immigration, housing and the cost of living?
+* **RQ4, comparison with CIS.** Do the relative preferences for the three leaders among left-, centre- and right-leaning personas resemble those of the corresponding ideological groups in CIS data? The comparison concerns the ordering and direction of the preferences, not the scores.
+
+If time allows, otherwise in a follow-up paper:
+
+* **RQ5, electoral context.** Do the leaders' communication and its reception change between normal, pre-election, campaign and post-election periods? Is the effect of the speaker's name stronger during campaigns?
+
+Held in reserve, in case reviewers ask for it:
+
+* **RQ6, robustness across models.** Are the speaker-attribution, ideological-congruence and topic effects consistent across different LLMs?
 
 ## Sources
 
-| Source | Status | Documentation |
-| --- | --- | --- |
-| X posts | Collected: 10,863 posts, 2022-04 to 2026-10 | [docs/X_SCRIPTS.md](docs/X_SCRIPTS.md), [docs/X_RESULTS.md](docs/X_RESULTS.md) |
-| Congreso de los Diputados interventions | Collection and text extraction pipeline available | [docs/CONGRESO_SCRIPTS.md](docs/CONGRESO_SCRIPTS.md), [docs/CONGRESO_RESULTS.md](docs/CONGRESO_RESULTS.md) |
-| Media interviews | Planned as a secondary corpus for robustness checks | [docs/PROPOSAL.md](docs/PROPOSAL.md) |
+| Source | Paper | Status | Documentation |
+| --- | --- | --- | --- |
+| X posts | First | Collected: 10,863 posts, 2022-04 to 2026-10 | [docs/X_SCRIPTS.md](docs/X_SCRIPTS.md), [docs/X_RESULTS.md](docs/X_RESULTS.md) |
+| Congreso de los Diputados interventions | Follow-up | Collection and text extraction pipeline available | [docs/CONGRESO_SCRIPTS.md](docs/CONGRESO_SCRIPTS.md), [docs/CONGRESO_RESULTS.md](docs/CONGRESO_RESULTS.md) |
+| La Moncloa transcripts (Sánchez) | Follow-up | Collection and text extraction pipeline available | [docs/MONCLOA_SCRIPTS.md](docs/MONCLOA_SCRIPTS.md) |
+| PP media and official documents (Feijóo) | Follow-up | Media inventory and PDF text extraction pipeline available | [docs/PP_MEDIA_SCRIPTS.md](docs/PP_MEDIA_SCRIPTS.md) |
 
 All sources share the actor identifiers in `config/politicians.json` and the table formats in [docs/DATA_DICTIONARY.md](docs/DATA_DICTIONARY.md).
 
 ## Repository layout
 
 ```
-config/   politicians.json    actor registry shared by all sources
-          x_accounts.json     X handles and user IDs, joined by actor_id
-          x_collection.json   X collection window, query and fields
+config/   politicians.json      actor registry shared by all sources
+          x_accounts.json       X handles and user IDs, joined by actor_id
+          x_collection.json     X collection window, query and fields
+          moncloa_source.json   La Moncloa archive (follow-up paper)
+          pp_media_source.json  PP media and documents (follow-up paper)
 src/      check_x_access.py, collect_x.py, build_x_tables.py
           collect_congreso.py, extract_congreso_text.py
+          collect_moncloa.py, extract_moncloa_text.py
+          collect_pp_media.py, extract_pp_documents.py
 tests/    pytest tests, no network access
 docs/     proposal, data dictionary and per-source documentation
 data/     generated locally and never committed (raw/, processed/, cache/)
@@ -73,27 +89,11 @@ python src/build_x_tables.py               # internal and stimuli tables
 
 Costs, options and data handling are described in [docs/X_SCRIPTS.md](docs/X_SCRIPTS.md).
 
-## Congreso de los Diputados
+## Sources for the follow-up paper
 
-The pipeline downloads the official Open Data chronological JSON snapshot, verifies it with a SHA-256 checksum, filters the target politicians and extracts their speaker turns from the linked *Diario de Sesiones* pages.
+The Congreso, La Moncloa and PP pipelines stay in the repository for the follow-up paper. Their commands, outputs and quality checks are in [docs/CONGRESO_SCRIPTS.md](docs/CONGRESO_SCRIPTS.md), [docs/MONCLOA_SCRIPTS.md](docs/MONCLOA_SCRIPTS.md) and [docs/PP_MEDIA_SCRIPTS.md](docs/PP_MEDIA_SCRIPTS.md).
 
-```bash
-python src/collect_congreso.py \
-  --config config/politicians.json \
-  --output-dir data \
-  --contact-email YOUR_INSTITUTIONAL_EMAIL
-
-python src/extract_congreso_text.py \
-  --inventory data/processed/congreso_interventions.csv \
-  --config config/politicians.json \
-  --output-dir data/processed \
-  --cache-dir data/cache/congreso_text \
-  --contact-email YOUR_INSTITUTIONAL_EMAIL
-```
-
-For a small end-to-end test, add `--max-documents 3` to the second command. `keep_for_prompt` defaults to `false` pending sampling and manual quality checks.
-
-Recheck the official source and reuse conditions at collection time:
+Recheck the official Congreso source and reuse conditions at collection time:
 
 * [Congreso Open Data — interventions](https://www.congreso.es/es/opendata/intervenciones)
 * [Congreso legal and reuse notice](https://www.congreso.es/es/cem/aviso-legal)
@@ -103,9 +103,10 @@ Recheck the official source and reuse conditions at collection time:
 * The repository contains code, configuration and documentation only. Collected data, caches and credentials are never committed.
 * Each source produces an internal table with full provenance and a stimuli table for the persona experiments. Stimuli are pseudonymised, not anonymous, because the original text remains searchable.
 * X data is collected only through the official API. Only post IDs and derived labels may be shared.
-* Congreso material is used under its reuse conditions. Interview material is processed for research and not redistributed.
+* Congreso and La Moncloa material is used under the reuse conditions of each source. Interview material is processed for research and not redistributed.
 * Politicians' public statements are still personal data under the GDPR. They are processed for academic, non-commercial research only.
-* Persona positions are selection criteria, not claims about real voters or party electorates.
+* The attributed conditions show posts under the names of leaders who did not write them. These counterfactual attributions exist only inside the prompts and are never published as statements by those leaders.
+* Elicited ideological self-placement is the model's interpretation of a persona, not ground truth. Persona groups are not claims about real voters or party electorates.
 
 ## Contributing
 

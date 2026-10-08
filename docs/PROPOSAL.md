@@ -1,64 +1,87 @@
 # Project proposal
 
-Status: draft for discussion (2026-09-17). Items marked **[open]** need a decision.
+Status: study design agreed at the meeting of 2026-10-07 (Víctor, Candida, Paolo). Items marked **[open]** need a decision.
 
 Working title: *Same message, different speaker? Persona-conditioned moral and cultural reception of Spanish party leaders' political communication*
 
 ## 1. Summary
 
-This project extends the design of our EMNLP Findings 2026 paper (*"My own morality, my own mind": Persona-Conditioned Moral and Cultural Reception on Trump Messages*) to the three leaders of the largest Spanish national parties in the XV Legislature: Pedro Sánchez (PSOE), Alberto Núñez Feijóo (PP) and Santiago Abascal (VOX).
+The first paper of this project is a speaker-attribution experiment on X posts by the leaders of the three largest Spanish national parties in the XV Legislature: Pedro Sánchez (PSOE), Alberto Núñez Feijóo (PP) and Santiago Abascal (VOX).
 
-Theory-grounded synthetic personas (Inglehart–Welzel cultural values and Moral Foundations Theory) evaluate topic-specific bundles of the leaders' messages with the same structured labels as the previous paper (stance, agreement, legitimacy, offensiveness, endorsement). The study keeps the three-layer evaluation (internal differentiation, explanatory structure, external plausibility) and adds what a single-actor US study could not test: whether reception follows the **message** or the **speaker**, in a multi-party, non-English, highly polarised context, with an external benchmark from the Spanish Centro de Investigaciones Sociológicas (CIS).
+Synthetic personas judge the same post in four conditions:
 
-The general election is expected in February–March 2027, so results are timely before and during the campaign.
+* without an author;
+* attributed to Sánchez;
+* attributed to Feijóo;
+* attributed to Abascal.
+
+The message stays the same; only the name changes. This tests whether the speaker's name changes how the same message is judged, which our single-actor EMNLP Findings 2026 paper on Trump (*"My own morality, my own mind": Persona-Conditioned Moral and Cultural Reception on Trump Messages*) could not test. It is the main new contribution.
+
+The effect is then broken down by the personas' elicited ideological self-placement (left, centre, right) and by topic, and compared with the relative evaluations of the three leaders by the corresponding ideological groups in surveys of the Spanish Centro de Investigaciones Sociológicas (CIS).
+
+X posts are the only corpus of this paper. Parliamentary interventions and interviews are left for a follow-up paper (§4). The general election is expected in early 2027.
 
 ## 2. Relation to the previous paper
 
-Carried over unchanged, unless a decision below says otherwise:
+Carried over, unless a decision below says otherwise:
 
-* Persona families and selection strategies (IW-neigh, IW-contour, MFT) with *high*, *mid* and *low* topic-conditioned positions.
-* Prompt template, output JSON schema and reception labels.
+* The culturally grounded persona pool of Greco et al. (2026), with Inglehart–Welzel (IW) coordinates and MFQ-2 moral-foundation profiles.
+* Prompt template, output JSON schema and reception labels (stance, agreement, legitimacy, offensiveness, endorsement).
 * Deterministic, auditable corpus construction: quality filters, moral-relevance filter, high-precision topic keyword registry (one topic per message), anonymization as a task-control procedure, prompt-readiness checks.
-* RQ1 descriptive analysis, RQ2 closed frequent itemsets with lift, RQ3 topic-level alignment with a survey benchmark.
 * No redistribution of raw source text.
+
+Changed:
+
+* The central question is the speaker, not the differentiation between personas. The previous RQ1 (differences across topic-conditioned persona positions) and RQ2 (closed frequent itemsets) are not research questions of this paper.
+* Personas are compared by their elicited ideological self-placement (§8).
+* The external benchmark compares the ordering of leader preferences by ideological group, not topic-level distributions, because the CIS has no topic-by-leader items comparable to the Pew items of the previous paper (§9).
 
 Lessons from the previous paper that shape this design:
 
-* **Construct gap.** Pew items measured confidence in the actor's handling of a domain, whereas personas judged concrete messages. Prefer benchmark items that measure agreement with positions or policies when they exist.
-* **Neutral mass.** Synthetic outputs put 8–33% of mass on *neutral*, while Pew items had no midpoint. Record the response scale of each benchmark item and compare like with like.
-* **Message-driven topics.** *Judiciary/courts* produced uniform rejection with almost no persona separation. In Spain, criticism of judges and courts comes from both the government and the opposition, which lets us test whether that pattern follows the rhetoric or the speaker.
-* **Single model.** All generations came from gpt-oss-20b. Add a second model.
+* **Construct gap.** Pew items measured confidence in the actor's handling of a domain, whereas personas judged concrete messages. The CIS comparison is therefore limited to the ordering and direction of leader preferences, not their scores.
+* **Neutral mass.** Synthetic outputs put 8–33% of mass on *neutral*, while Pew items had no midpoint. Record the response scale of each CIS item and compare like with like.
+* **Message-driven topics.** *Judiciary/courts* produced uniform rejection with almost no persona separation. Attribution tests directly whether such patterns follow the rhetoric or the speaker.
+* **Single model.** All generations came from gpt-oss-20b. A second model is RQ6.
 
 ## 3. Research questions
 
-* **RQ1, internal differentiation.** Do personas selected for different topic-conditioned positions differ in their reception of the same leader's messages, and do the patterns found for Trump replicate for Spanish leaders?
-* **RQ2, explanatory structure.** Which combinations of demographic, cultural and moral persona attributes characterise supportive, rejecting and neutral responses, by actor and topic?
-* **RQ3, external plausibility.** Do aggregate synthetic distributions align with CIS public-opinion distributions, both at topic × actor level and for respondent subgroups matched by ideology or vote recall?
-* **RQ4, speaker versus message (new).** Within a topic, how much of the reception is explained by the actor, the persona position and their interaction, and how does it change when the speaker is revealed instead of anonymized?
-* **RQ5, venue (extension or follow-up paper).** Does reception of the same actor on the same topic differ between X posts, parliamentary interventions and media interviews?
+Core of the first paper:
+
+* **RQ1, speaker attribution.** How does attributing the same political message to Sánchez, Feijóo or Abascal, rather than presenting it anonymously, change its evaluation by synthetic personas?
+* **RQ2, ideological congruence.** Does the speaker-attribution effect depend on the persona's elicited ideological self-placement? In particular, do personas respond more positively when the attributed speaker is ideologically closer to them?
+* **RQ3, differences across topics.** Does the size or direction of the speaker-attribution effect vary across salient political topics, such as immigration, housing and the cost of living?
+* **RQ4, external comparison with CIS.** Do the relative preferences for Sánchez, Feijóo and Abascal among left-, centre- and right-leaning synthetic personas resemble the relative leader evaluations found among the corresponding ideological groups in CIS data? The comparison concerns the general ordering and direction of the preferences, not equality between synthetic and CIS scores.
+
+If time allows, otherwise in a follow-up paper:
+
+* **RQ5, electoral context.** Do leaders' communication and its reception change between normal political periods, pre-election periods, election campaigns and post-election periods? In particular, does the effect of the speaker's name become stronger during election campaigns?
+
+Held in reserve, run only if reviewers ask for it so that it does not take focus from RQ1–RQ4:
+
+* **RQ6, robustness across models.** Are the speaker-attribution, ideological-congruence and topic effects consistent across different LLMs?
+
+The central contribution comes from RQ1 and RQ2. RQ3 shows whether the effect generalises across political issues, and RQ4 provides an external comparison with CIS.
 
 ## 4. Actors and sources
 
-| Actor ID | Leader | Party | X account | Congreso | Interviews |
-| --- | --- | --- | --- | --- | --- |
-| `pedro_sanchez` | Pedro Sánchez | PSOE | @sanchezcastejon | 375 segments | secondary corpus |
-| `alberto_nunez_feijoo` | Alberto Núñez Feijóo | PP | @NunezFeijoo | 184 segments | secondary corpus |
-| `santiago_abascal` | Santiago Abascal | VOX | @Santi_ABASCAL | 66 segments | secondary corpus |
+| Actor ID | Leader | Party | X account | X posts |
+| --- | --- | --- | --- | --- |
+| `pedro_sanchez` | Pedro Sánchez | PSOE | @sanchezcastejon | 3,902 |
+| `alberto_nunez_feijoo` | Alberto Núñez Feijóo | PP | @NunezFeijoo | 3,515 |
+| `santiago_abascal` | Santiago Abascal | VOX | @Santi_ABASCAL | 3,446 |
 
-Congreso counts come from `docs/CONGRESO_RESULTS.md` (2023-09-26 to 2026-06-24). Actor IDs are shared across sources (`config/politicians.json`, `config/x_accounts.json`).
+X counts come from `docs/X_RESULTS.md` (2022-04-01 to 2026-10-02, retweets excluded). Actor IDs are shared across sources (`config/politicians.json`, `config/x_accounts.json`).
 
-* **X.** Official API v2, pay-per-use, full-archive search. Main corpus for RQ1–RQ4. See `docs/X_SCRIPTS.md`.
-* **Congreso.** Official Open Data and *Diario de Sesiones*. See `docs/CONGRESO_SCRIPTS.md`. Main corpus for RQ5; the Abascal subset is small.
-* **Interviews.** Given the rights questions around Art. 67 of the Spanish copyright law, treated as a secondary corpus for robustness checks. Process only, never redistribute.
+* **X.** Official API v2, pay-per-use, full-archive search. The only corpus of this paper. See `docs/X_SCRIPTS.md` and `docs/X_RESULTS.md`.
+* **Follow-up paper.** Congreso interventions (`docs/CONGRESO_SCRIPTS.md`, `docs/CONGRESO_RESULTS.md`), La Moncloa transcripts (`docs/MONCLOA_SCRIPTS.md`) and PP media and official documents (`docs/PP_MEDIA_SCRIPTS.md`). Their pipelines stay in the repository. They are left out of this paper because parliamentary speeches contain many clues about the real speaker, which makes a truly anonymous condition hard to build, and because the material is unbalanced across leaders (Congreso: Sánchez 375, Feijóo 184, Abascal 66 segments). The comparison between X, parliament and interviews moves to the follow-up paper with them. Interviews remain a process-only corpus because of the rights questions around Art. 67 of the Spanish copyright law.
 
 Other leaders (Sumar once it has a leader, Podemos, ERC, Junts, EH Bildu, PNV) can be added through the configuration files. Regional leaders often post in other languages, which would need a separate language decision.
 
 ## 5. Time windows
 
-* **Collection window [open]:** from April 2022, when Feijóo became PP leader, to the end of collection. Proposed because it is cheap and gives all three actors in their current leadership roles.
-* **Main analysis window:** XV Legislature, from 2023-08-17.
-* **Comparison window:** the July 2023 general election campaign, as a reference for campaign versus routine communication.
-* **Updates:** weekly incremental collection until the election.
+* **Collection window.** From 2022-04-01, when Feijóo became PP leader, to 2026-10-02 (collected). Weekly incremental updates until the election.
+* **Analysis window [open].** The XV Legislature, from 2023-08-17, as proposed before, or the full collection window. RQ5 needs the full window, because it includes the May 2023 municipal and regional elections and the July 2023 general election.
+* **Election periods (RQ5) [open].** Boundaries of the normal, pre-election, campaign and post-election periods, and which elections count (general, municipal and regional, European).
 
 ## 6. Corpus construction
 
@@ -67,19 +90,27 @@ Other leaders (Sumar once it has a leader, Podemos, ERC, Junts, EH Bildu, PNV) c
 3. **Quality filters.** Remove retweets (already excluded at query time), decode HTML entities, remove URLs, normalise whitespace, drop very short or low-information posts. **[open]** Keep replies and quote posts, or keep only original posts. Replies and quotes are collected either way and filtered here.
 4. **Moral relevance.** ME2-BERT, if it supports Spanish. **[open]** Otherwise a multilingual alternative or translation, validated on a manually annotated sample.
 5. **Topic assignment.** Spanish high-precision keyword registry, exactly-one-match rule, `review_needed` for multi-topic hits, as in the previous paper.
-6. **Anonymization.** Replace actor names and nicknames, party names and acronyms, campaign slogans and hashtags, and user handles with placeholders (`[POLITICAL_ACTOR]`, `[PARTY]`, `[CAMPAIGN_TAG]`, `[USER]`). Check for identity leaks, degradation and context dependence.
-7. **Author role.** Role at the time of posting. **[open]** Roles such as "President of the Government" identify the actor. Decide whether the anonymized condition uses a neutral role (e.g., "a Spanish national party leader") and the attributed condition of RQ4 reveals it.
-8. **Bundles.** Topic-specific, single-actor, date-ordered bundles, balanced by actor within each topic and period.
+6. **Anonymization.** Replace actor names and nicknames, party names and acronyms, campaign slogans and hashtags, and user handles with placeholders (`[POLITICAL_ACTOR]`, `[PARTY]`, `[CAMPAIGN_TAG]`, `[USER]`). Check for identity leaks, degradation and context dependence. The anonymized text is shown in all four conditions.
+7. **Attribution conditions.** The no-author condition shows the anonymized post with a neutral role. Each attributed condition shows the same text with one leader named as its author. **[open]** How the speaker is named (name only, or name and party), and whether institutional roles such as "President of the Government" are shown, since they identify Sánchez.
+8. **Cross-attribution checks [open].** Some posts identify their author through their content (e.g., "mi Gobierno", references to the speaker's own party or past acts), so they cannot plausibly be attributed to another leader. Decide whether to filter them or restrict their attributions. A leakage probe, asking the model to guess the author of the no-author version, would measure how anonymous that condition really is.
+9. **Unit of judgment [open].** The meeting design shows a single post. Decide whether topic-specific, single-actor bundles are kept as a second level, as in the previous paper, with one attributed author per bundle.
 
-## 7. Candidate topics
+## 7. Topics
 
-The final set is the overlap between topics with enough messages from all three actors and topics with CIS items, as with Pew in the previous paper.
+The final set is a small number of issues that are salient in Spain during the study period. Each topic must be frequent enough in the data and discussed by all three leaders, so that the leaders are compared on similar messages. This serves two purposes: differences between leaders do not simply reflect that they discuss different issues, and RQ3 can test whether the attribution effect appears across topics or only for particular issues. CIS items are no longer a selection criterion (§9).
 
-| Candidate topic | Examples of expected content |
+Starting set agreed at the meeting:
+
+| Topic | Examples of expected content |
 | --- | --- |
-| `immigration_border` | arrivals, regularisation, unaccompanied minors, border control |
-| `housing_cost_of_living` | housing, rents, prices, wages |
-| `economy_employment` | employment, taxes, pensions, growth |
+| `immigration_border` | arrivals, the situation in Ceuta, regularisation, unaccompanied minors, border control |
+| `housing_rents` | access to housing, rising rents, housing policy |
+| `economy_cost_of_living` | prices, wages, employment, taxes, pensions |
+
+Further candidates, kept only if they meet the same criteria **[open]**:
+
+| Topic | Examples of expected content |
+| --- | --- |
 | `judiciary_rule_of_law` | judges, courts, Constitutional Court, Attorney General, "lawfare" |
 | `corruption` | corruption investigations and accountability |
 | `territorial_model` | Catalonia, amnesty, regional financing |
@@ -87,61 +118,86 @@ The final set is the overlap between topics with enough messages from all three 
 | `gender_equality` | feminism, gender violence, equality policies |
 | `emergencies_climate` | floods, wildfires, energy, climate policy |
 
-## 8. Personas **[open, Candida]**
+## 8. Personas
 
-* **Option A.** Reuse the WVS-grounded persona pool of Greco et al. (2026) unchanged, keeping the previous paper's selection procedure for comparability.
-* **Option B.** Build a Spain-grounded pool from EVS/WVS data for Spain, possibly adding Spain-relevant variables such as left–right self-placement and territorial identity. This makes subgroup matching with CIS respondents easier (RQ3).
-
-Topic-to-dimension mappings (IW axes, MFT foundations) must be fixed before generation, as in the previous paper, including rationales for the new Spanish topics.
+* **Pool.** The persona pool of Greco et al. (2026), not restricted by country. In Candida's preliminary analysis, the country label carried no cultural effect (gpt-oss assigns it almost at random, mostly the United States), and the pool is not intended to represent any real population.
+* **Elicited ideological self-placement.** The pool has no left–right variable. Before showing any post, every persona answers the CIS 1–10 left–right self-placement question. It is the model's interpretation of the persona, not ground truth. It is used only to form left, centre and right groups, and the persona's group is never included in the prompts in which it judges messages.
+* **[open, Candida]** Which personas from the pool are used: the whole pool, a sample, or the IW/MFT selection strategies of the previous paper.
+* **[open]** Frame of reference. The left–right scale is relative to each country's party system, so decide whether personas answer it, and judge the posts, as residents of Spain.
+* **[open]** Stability. Repeated or paraphrased elicitation, and whether personas with unstable answers are dropped.
+* **[open]** Additional CIS items to make the placement more robust: vote recall and party sympathy, and the placement of PSOE, PP and VOX on the same scale as a check that the persona understands the Spanish scale. Leader ratings are not used for grouping, because they are the outcome compared in RQ4.
+* **[open]** Cut-offs for the left, centre and right groups. They must be the same as those used for CIS respondents in RQ4.
 
 ## 9. External benchmark: CIS
 
-CIS barómetros are published monthly with free microdata, and the CIS runs a pre-electoral survey before general elections. Items to inventory, with availability checked wave by wave:
+In the previous paper, Pew provided public opinion that could be compared by political topic. The CIS does not provide that kind of topic-level information for this study; it mainly provides general evaluations of Sánchez, Feijóo and Abascal. It is therefore used as a broader check (RQ4), for example:
 
-* Ratings of and confidence in party leaders.
-* Most important problems facing Spain (issue salience by topic).
-* Opinion on specific policies when asked (e.g., amnesty, immigration, housing measures). These are preferred because they reduce the construct gap.
-* Ideological self-placement (1–10), vote recall and vote intention, used to build subgroup benchmarks.
+* Among left-wing personas, does Sánchez's name produce the most positive effect? Among left-wing CIS respondents, is Sánchez also the most positively evaluated leader?
+* Do right-wing personas and right-wing CIS respondents show a similar relative preference for Feijóo or Abascal?
 
-Selection follows the Pew protocol: deterministic inventory, inclusion and exclusion codes, weighted distributions, positive/negative/neutral/missing mapping, rule trace per item.
+The comparison concerns the general pattern, not the exact scores. It does not show that the personas represent Spanish citizens, only whether the synthetic political pattern resembles the pattern found in CIS data.
+
+Items to inventory, with availability checked wave by wave:
+
+* Ratings of and confidence in the three leaders.
+* Ideological self-placement (1–10), to form the CIS groups with the same cut-offs as the personas.
+* **[open]** Waves: those covering the analysis window, or the most recent ones before the election.
+
+Selection follows the Pew protocol of the previous paper: deterministic inventory, inclusion and exclusion codes, weighted distributions, response-scale record, rule trace per item.
 
 ## 10. Generation setup
 
 * gpt-oss-20b served with vLLM through an OpenAI-compatible API, temperature 0.01, max 4096 tokens, same hardware as the previous paper.
-* **[open]** Second model for cross-model replication, preferably open weights with strong Spanish (e.g., a BSC ALIA/Salamandra model or another multilingual open model).
+* A second model only if RQ6 is run, preferably open weights with strong Spanish (e.g., a BSC ALIA/Salamandra model or another multilingual open model).
 * **[open]** Prompt language: Spanish messages with the English prompt template, or a validated Spanish translation of the template.
 
 ## 11. Analyses
 
-* **RQ1.** Mean stance and label distributions by strategy × topic × position × actor, at bundle and message level; best versus top-5.
-* **RQ2.** Expanded persona samples and closed frequent itemsets with lift, per strategy × topic × actor.
-* **RQ3.** Topic × actor net scores against CIS; Pearson and Spearman correlations, MAE, top-topic recovery; subgroup-matched comparison if personas allow it.
-* **RQ4.** Models of stance and labels with actor, persona position, their interaction and anonymized/attributed condition as predictors, with persona and bundle as random effects (e.g., ordinal mixed-effects models).
-* **RQ5.** Same design with bundles drawn from each venue, restricted to actor × topic cells with enough material.
+* **RQ1.** For each persona and post, compare stance and labels in each attributed condition with the no-author condition. Models with the condition as predictor and persona and post as random effects (e.g., ordinal mixed-effects models).
+* **RQ2.** The RQ1 models with the interaction between attributed leader and persona ideological group. Congruence: whether the shift is more positive when the attributed leader is ideologically closer to the persona.
+* **RQ3.** The interaction between attributed leader and topic, with effects estimated within each topic and compared across topics.
+* **RQ4.** Within each ideological group, rank the three leaders by their synthetic attribution effect and by their weighted mean CIS evaluation, and compare the rankings and the direction of the differences between leaders.
+* **RQ5.** Label posts by election period. Compare the topics and communication of each leader across periods, and add period × attributed leader to the RQ1 models.
+* **RQ6.** Re-run RQ1–RQ3 with a second model and compare the direction and size of the effects.
 
 ## 12. Ethics, legal and data release
 
 * X data is collected only through the official API under the developer terms. No scraping or account pools.
 * Politicians' public statements are still personal data under the GDPR. Processing is limited to research purposes, stored securely, and not used to profile private individuals.
+* The attributed conditions show posts under the names of leaders who did not write them. These counterfactual attributions exist only inside the prompts. They are never published as statements by those leaders, and any example in the paper names its real author.
 * Released material: code, configuration, rule tables, audit artifacts, post IDs and derived labels. Not released: post text, Congreso caches, interview transcripts or audio.
 * A DSA Art. 40(12) data access application is submitted in parallel, but the project does not depend on it.
-* Persona labels are selection positions, not claims about real voters or party electorates.
+* Elicited ideological self-placement is the model's interpretation of a persona, not ground truth. Persona groups are not claims about real voters or party electorates.
 
-## 13. Timeline (proposal)
+## 13. Timeline
 
 | Period | Milestone |
 | --- | --- |
-| Sep–Oct 2026 | X collection; CIS item inventory; persona decision; topic registry draft |
-| Oct–Nov 2026 | Moral relevance, topics, anonymization, prompt-ready pool; RQ1 and RQ4 generations |
-| Nov–Dec 2026 | RQ2 and RQ3 analyses; Congreso bundles for RQ5; paper draft |
-| Jan 2027 | Preprint before the campaign; submission to the target venue **[open]** |
+| Oct 2026 | Topic registry, anonymization and attribution conditions; elicited self-placement; CIS inventory |
+| Oct–Nov 2026 | RQ1–RQ3 generations and analyses; RQ4 comparison with CIS |
+| Mid-Nov 2026 | Preprint |
+| Nov 2026–Jan 2027 | RQ5 if time allows; ARR submission targeting ACL 2027 **[open]** exact cycle |
+| Later | Follow-up paper: Congreso and interviews, venue comparison, RQ5 if not included |
 
-## 14. Open decisions
+## 14. Decisions
 
-1. Collection window start (April 2022 proposed).
-2. Replies and quote posts: keep or drop.
-3. Personas: option A or B.
-4. Neutral versus revealing author roles in the anonymized condition.
-5. Second model and prompt language.
-6. Whether RQ5 belongs in this paper or a follow-up.
-7. Target venue and deadline.
+Decided at the meeting of 2026-10-07:
+
+* X posts only. Congreso and interviews, and the comparison between venues, go to a follow-up paper.
+* RQ1–RQ4 are the core of the paper. RQ5 is included if time allows, otherwise it goes to the follow-up paper. RQ6 is held in reserve in case reviewers ask for it.
+* Personas are grouped by elicited ideological self-placement, which is never shown to them when they judge messages.
+* CIS is used to compare the ordering of leader preferences by ideological group, not topic-level distributions.
+
+Decided earlier: collection window from April 2022 (collected); preprint in mid-November 2026 and ARR submission targeting ACL 2027.
+
+Still open:
+
+1. Replies and quote posts: keep or drop (§6).
+2. Analysis window and election periods (§5).
+3. How the speaker is named in the attributed conditions, and which author role each condition shows (§6).
+4. Cross-attribution plausibility filter and leakage probe (§6).
+5. Unit of judgment: single post or also bundles (§6).
+6. Final topic set (§7).
+7. Persona sampling, frame of reference, elicitation stability, additional CIS items and group cut-offs (§8).
+8. CIS waves (§9).
+9. Prompt language, and the second model if RQ6 is run (§10).
