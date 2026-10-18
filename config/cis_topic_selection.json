@@ -1,6 +1,9 @@
 {
-  "version": "1.0.0",
+  "version": "1.1.0",
   "fixed_on": "2026-10-18",
+  "changes": [
+    "1.1.0 (2026-10-18, after the download): label_aliases added to merge renamed wordings of the same CIS category. k, exclusions and mapping unchanged."
+  ],
   "description": "Rule for selecting the RQ3 topics from the CIS monthly barometers. Fixed before the CIS data were downloaded. Rationale in docs/TOPIC_SELECTION.md.",
   "source": {
     "survey": "CIS Barómetro (monthly)",
@@ -44,6 +47,16 @@
     "political": "Names the political class, the parties, the government or the state of politics as the problem, not a policy area. Leaders' posts of this kind go to the residual category.",
     "diffuse": "No identifiable policy area that a keyword registry could match.",
     "non_substantive": "Not a problem category."
+  },
+  "label_aliases": {
+    "La subida de impuestos": "La subida de los impuestos",
+    "Las desigualdades, incluida la de género, diferencias de clases, la pobreza": "Las desigualdades, incluida la de género, las diferencias de clases, la pobreza",
+    "Los problemas relacionados con la juventud. Falta de apoyo y oportunidades para los/as jóvenes": "Los problemas relacionados con la juventud. Falta de apoyo y oportunidades a los/as jóvenes",
+    "Ciberseguridad: uso, delitos y regulación de nuevas tecnologías": "La ciberseguridad: uso, delitos y regulación de nuevas tecnologías",
+    "Problemas derivados del turismo. Masificación": "Los problemas derivados del turismo. Masificación",
+    "La falta de inversión en industrias e I+D": "El modelo productivo español. La falta de inversión en industrias e I+D",
+    "Problemas psicológicos derivados de la pandemia (preocupaciones, soledad, tristeza, desamparo, etc.)": "Problemas psicológicos (preocupaciones, soledad, tristeza, desamparo, etc.)",
+    "\"Los recortes\"": "La falta de servicios públicos. Los recortes"
   },
   "mapping": {
     "household_costs": ["^la vivienda$", "tarifas energeticas", "crisis energetica", "subida de (los )?precios", "inflacion", "coste de la vida"],

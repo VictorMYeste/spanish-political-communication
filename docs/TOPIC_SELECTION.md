@@ -59,6 +59,81 @@ Two choices deserve a note:
 
 The patterns that implement the mapping are in `config/cis_topic_selection.json`. Labels are matched after lower-casing and removing accents, exclusions first, then the topics in the order listed, and the first match wins.
 
+### Renamed labels
+
+The CIS slightly rewords some categories during the window, for example "La subida de impuestos" and "La subida de los impuestos". Without merging them, each wording would compete separately with half of the months. `label_aliases` in the config merges the wordings of the same category. It was added after the download, because the wordings were only known then. It is a technical correction, not a mapping decision: it only affects categories that compete on their own, and the ranking is the same without it (see [Robustness](#robustness)).
+
+Two housing categories, "Las hipotecas" and "Los desahucios", appear in some barometers and are not in the mapping fixed beforehand. They were left out to keep the mapping as fixed; adding them changes the mean of household costs from 22.9 to 23.0.
+
+## Running
+
+```bash
+python src/collect_cis_problems.py   # about 100 requests to cis.es, a few minutes
+python src/select_cis_topics.py      # ranking, no network
+```
+
+`collect_cis_problems.py` finds each barometer at `https://www.cis.es/es/estudios/barometro-de-<month>-<year>`, or on the CIS homepage when the newest one is only published as a results preview. It downloads the results PDF (`es<study>mar`) and parses the main-problems table. PDFs are kept and reused on later runs.
+
+| Output | Content |
+| --- | --- |
+| `data/raw/cis/es<study>mar.pdf` | Results PDF of each barometer, as published |
+| `data/processed/cis_problems_monthly.csv` | One row per barometer and CIS category: first, second, third and TOTAL percentages, N, source URL |
+| `data/processed/cis_topic_ranking.csv` | Mean, peak and member categories of every topic, standalone category and exclusion group |
+| `data/processed/cis_category_assignment.csv` | Where each CIS category went: excluded, topic or standalone |
+
+CIS data may be reused with attribution to the CIS ([conditions](https://www.cis.es/en/conditions-reusing-cis-data)). Cite the barometers as studies 3359 to 3582.
+
 ## Results
 
-To be filled in after running the selection.
+Run on 18 October 2026.
+
+**Coverage.** 46 barometers from April 2022 to October 2026. Nine months have no usable barometer:
+
+* August of every year (2022 to 2026) and June and September 2023, around the general election: no barometer was published.
+* May 2023 (study 3405): the table is printed transposed, with categories as columns, and the parser does not read it.
+* December 2024 (study 3489): no results PDF is published.
+
+Each parsed table was checked: the TOTAL percentages of a barometer add up to between 252.6 and 274.5, as expected when most respondents name two or three problems.
+
+**Ranking** (mean of the TOTAL percentage over the 46 barometers):
+
+| Rank | Topic | Mean % | Peak % (month) | Selected |
+| ---: | --- | ---: | --- | --- |
+| 1 | `economy_employment` | 63.2 | 92.5 (2023-04) | yes |
+| 2 | `household_costs` | 22.9 | 57.7 (2026-10) | yes |
+| 3 | `health` | 14.6 | 30.5 (2022-07) | yes |
+| 4 | `immigration_border` | 13.8 | 30.4 (2024-09) | yes |
+| 5 | `corruption` | 8.3 | 25.3 (2025-07) | yes |
+| 6 | La educación | 7.1 | 16.5 (2022-11) | |
+| 7 | Los problemas relacionados con la juventud | 7.0 | 12.7 (2025-10) | |
+| 8 | Las desigualdades, incluida la de género, las diferencias de clases, la pobreza | 6.9 | 17.8 (2024-06) | |
+| 9 | `environment_emergencies` | 6.3 | 16.4 (2024-02) | |
+| 10 | La inseguridad ciudadana | 4.6 | 8.8 (2022-11) | |
+| 11 | `territorial_model` | 3.5 | 9.2 (2023-12) | |
+| 13 | `foreign_policy_war` | 3.2 | 6.7 (2022-10) | |
+| 17 | `judiciary` | 1.9 | | |
+| 19 | `gender_equality` | 1.1 | | |
+| | Excluded: political | 62.1 | 74.8 (2023-12) | |
+| | Excluded: diffuse | 15.8 | 26.9 (2024-06) | |
+| | Excluded: non-substantive | 5.6 | 11.5 (2022-05) | |
+
+Merged topics are sums of their categories, so their means are upper bounds (see [Parameters and why](#parameters-and-why)). The full ranking is in `data/processed/cis_topic_ranking.csv`.
+
+The three topics proposed by the team (household costs, immigration and corruption) are all selected. The rule adds two more: the economy and employment, and health.
+
+### Robustness
+
+| Variant | Top 5 |
+| --- | --- |
+| As fixed | economy_employment, household_costs, health, immigration_border, corruption |
+| Without `label_aliases` | Same |
+| Health without the COVID-19 categories | Same (health falls to 4th) |
+| "Las hipotecas" and "Los desahucios" added to household costs | Same |
+| Last 12 barometers only | Same (immigration 3rd, corruption 5th) |
+| `economy_employment` split into its three CIS categories | Unemployment and job quality enter separately; corruption falls to 7th |
+
+The result depends on one decision: merging the economy, unemployment and job quality into one topic. That merge was part of the rule fixed before the download (commit `9b5c035`), and it matches the keyword registry, where the three are hard to separate in short posts.
+
+### Next step
+
+Coverage (rule step 5) needs the keyword registry for the five selected topics. A topic is kept only if each leader has at least 10 original posts on it.
