@@ -21,10 +21,14 @@ These are public statements by public figures, but they are still personal data 
 ```
 raw/        responses exactly as the sources returned them
   x/        <actor_id>/<YYYY-MM>.jsonl, one API page per line, plus manifest.jsonl
+  cis/      es<study>mar.pdf, results PDF of each CIS barometer
 processed/  tables built from the raw data
   x_posts_internal.csv   full text and provenance, one row per post
   x_stimuli.csv          pseudonymised table for the persona experiments
   x_build_summary.json   counts, date range and quality checks of the build
+  cis_problems_monthly.csv      CIS main problems of Spain, one row per barometer and category
+  cis_topic_ranking.csv         topic ranking for RQ3 (docs/TOPIC_SELECTION.md)
+  cis_category_assignment.csv   where each CIS category went in the ranking
 ```
 
 Folders for the other sources (`raw/congreso/`, `raw/moncloa/`, `cache/`) appear when those pipelines are run.
