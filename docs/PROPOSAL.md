@@ -87,7 +87,7 @@ Other leaders (Sumar once it has a leader, Podemos, ERC, Junts, EH Bildu, PNV) c
 
 1. **Collection.** Raw API responses stored untouched, with query manifests (`docs/X_SCRIPTS.md`).
 2. **Normalisation.** Shared internal and stimuli tables per source (`docs/DATA_DICTIONARY.md`).
-3. **Quality filters.** Remove retweets (already excluded at query time), decode HTML entities, remove URLs, normalise whitespace, drop very short or low-information posts. **[open]** Keep replies and quote posts, or keep only original posts. Replies and quotes are collected either way and filtered here.
+3. **Quality filters.** Remove retweets (already excluded at query time), decode HTML entities, remove URLs, normalise whitespace, drop very short or low-information posts. Only original posts are used: quotes and replies depend on another author's text, which would either be missing from the stimulus or add a second, often identifiable, author. They stay in the internal table for context but do not become stimuli.
 4. **Moral relevance.** ME2-BERT, if it supports Spanish. **[open]** Otherwise a multilingual alternative or translation, validated on a manually annotated sample.
 5. **Topic assignment.** Spanish high-precision keyword registry (`config/x_topic_keywords.json`), exactly-one-match rule, `review_needed` for multi-topic hits, as in the previous paper. Results and spot check in [TOPIC_SELECTION.md](TOPIC_SELECTION.md).
 6. **Anonymization.** Replace actor names and nicknames, party names and acronyms, campaign slogans and hashtags, and user handles with placeholders (`[POLITICAL_ACTOR]`, `[PARTY]`, `[CAMPAIGN_TAG]`, `[USER]`). Check for identity leaks, degradation and context dependence. The anonymized text is shown in all four conditions.
@@ -180,15 +180,14 @@ Decided at the meeting of 2026-10-07:
 * Personas are grouped by elicited ideological self-placement, which is never shown to them when they judge messages.
 * CIS is used to compare the ordering of leader preferences by ideological group, not topic-level distributions.
 
-Decided earlier: collection window from April 2022 (collected); preprint in mid-November 2026 and ARR submission targeting ACL 2027; final topic set (§7).
+Decided earlier: collection window from April 2022 (collected); preprint in mid-November 2026 and ARR submission targeting ACL 2027; original posts only, without replies and quotes (§6); final topic set (§7).
 
 Still open:
 
-1. Replies and quote posts: keep or drop (§6).
-2. Analysis window and election periods (§5).
-3. How the speaker is named in the attributed conditions, and which author role each condition shows (§6).
-4. Cross-attribution plausibility filter and leakage probe (§6).
-5. Unit of judgment: single post or also bundles (§6).
-6. Persona sampling, frame of reference, elicitation stability, additional CIS items and group cut-offs (§8).
-7. CIS waves (§9).
-8. Prompt language, and the second model if RQ6 is run (§10).
+1. Analysis window and election periods (§5).
+2. How the speaker is named in the attributed conditions, and which author role each condition shows (§6).
+3. Cross-attribution plausibility filter and leakage probe (§6).
+4. Unit of judgment: single post or also bundles (§6).
+5. Persona sampling, frame of reference, elicitation stability, additional CIS items and group cut-offs (§8).
+6. CIS waves (§9).
+7. Prompt language, and the second model if RQ6 is run (§10).
