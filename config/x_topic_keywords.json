@@ -1,13 +1,20 @@
 {
-  "version": "1.1.0",
+  "version": "1.2.0",
   "updated": "2026-10-18",
   "description": "Keyword registry for the RQ3 topics selected in docs/TOPIC_SELECTION.md. High precision over recall: terms must name the issue, not a mood or a party.",
   "changes": [
-    "1.1.0 (2026-10-18, after the first coverage run and a 100-post spot check): precision fixes for all topics (exclude_phrases; health without 'pandemia' and 'hospitalari-'; economy adjectives only in fixed phrases, no 'economias') and 'pobreza energetica' added to household_costs. Before/after counts in docs/TOPIC_SELECTION.md."
+    "1.1.0 (2026-10-18, after the first coverage run and a 100-post spot check): precision fixes for all topics (exclude_phrases; health without 'pandemia' and 'hospitalari-'; economy adjectives only in fixed phrases, no 'economias') and 'pobreza energetica' added to household_costs. Before/after counts in docs/TOPIC_SELECTION.md.",
+    "1.2.0 (2026-10-18, after the manual spot check): accented verb forms removed before accents are stripped ('paró', 'empleó'), and 'inquilino de la Moncloa' and evacuated homes added to exclude_phrases."
   ],
-  "normalization": "URLs removed, lower-cased, accents removed, whitespace collapsed, exclude_phrases removed. Each group is compiled as \\b(?:p1|p2|...)\\b and searched in the normalized text.",
+  "normalization": "URLs removed, lower-cased, exclude_accented removed, accents removed, whitespace collapsed, exclude_phrases removed. Each group is compiled as \\b(?:p1|p2|...)\\b and searched in the normalized text.",
+  "exclude_accented": [
+    "paró",
+    "empleó"
+  ],
   "exclude_phrases": [
     "cordon sanitario",
+    "inquilin[oa]s? de (la )?moncloa",
+    "(abandon|desaloj|evacu)\\w* (de )?(sus |las |su |la )?viviendas?",
     "viviendas (afectadas|danadas|destruidas|desalojadas|evacuadas|inundadas|arrasadas|quemadas)"
   ],
   "assignment": "A post gets a topic when exactly one topic matches, review_needed when several match, and other when none matches.",

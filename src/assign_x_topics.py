@@ -46,7 +46,17 @@ OUT_FIELDS = [
     "topic_groups",
     "matched_terms",
 ]
-SPOTCHECK_FIELDS = ["topic", "message_id", "actor_id", "date", "matched_terms", "text", "is_correct", "note"]
+SPOTCHECK_FIELDS = [
+    "topic",
+    "message_id",
+    "actor_id",
+    "date",
+    "matched_terms",
+    "text",
+    "is_correct",
+    "is_main_topic",
+    "note",
+]
 
 
 def normalize(text: str) -> str:
@@ -61,6 +71,11 @@ class Registry:
     """Compiled keyword groups per topic."""
 
     def __init__(self, spec: Dict):
+        # Words whose meaning depends on the accent ("paró" stopped, "paro"
+        # unemployment) are removed before normalize() strips the accents.
+        self.exclude_accented = [
+            re.compile(r"\b" + word + r"\b") for word in spec.get("exclude_accented", [])
+        ]
         self.exclude = [re.compile(r"\b" + phrase + r"\b") for phrase in spec.get("exclude_phrases", [])]
         self.topics: List[Tuple[str, List[Tuple[str, re.Pattern]]]] = []
         for item in spec["topics"]:
@@ -76,7 +91,10 @@ class Registry:
 
     def match(self, text: str) -> Dict[str, Dict[str, List[str]]]:
         """Return {topic: {group: matched strings}} for the topics that match."""
-        normalized = normalize(text)
+        lowered = text.lower()
+        for pattern in self.exclude_accented:
+            lowered = pattern.sub(" ", lowered)
+        normalized = normalize(lowered)
         for pattern in self.exclude:
             normalized = pattern.sub(" ", normalized)
         hits: Dict[str, Dict[str, List[str]]] = {}
@@ -157,10 +175,19 @@ def spotcheck_sample(
                     "matched_terms": row["matched_terms"],
                     "text": texts[row["message_id"]],
                     "is_correct": "",
+                    "is_main_topic": "",
                     "note": "",
                 }
             )
     return sample
+
+
+def write_spotcheck(path: Path, rows: List[Dict[str, str]], overwrite: bool) -> bool:
+    """Write the spot-check sample unless an existing, possibly annotated, file would be lost."""
+    if path.exists() and not overwrite:
+        return False
+    write_csv(path, rows, SPOTCHECK_FIELDS)
+    return True
 
 
 def read_csv(path: Path) -> List[Dict[str, str]]:
@@ -197,6 +224,11 @@ def main(argv: Optional[List[str]] = None) -> int:
     parser.add_argument("--spotcheck", type=Path, default=DEFAULT_SPOTCHECK)
     parser.add_argument("--spotcheck-size", type=int, default=20, help="posts per topic")
     parser.add_argument("--seed", type=int, default=DEFAULT_SEED)
+    parser.add_argument(
+        "--overwrite-spotcheck",
+        action="store_true",
+        help="replace an existing spot-check file, which may hold manual annotations",
+    )
     args = parser.parse_args(argv)
 
     registry = Registry(json.loads(args.registry.read_text(encoding="utf-8")))
@@ -210,12 +242,16 @@ def main(argv: Optional[List[str]] = None) -> int:
 
     write_csv(args.out, labelled, OUT_FIELDS)
     write_csv(args.coverage, coverage_rows, ["topic"] + actors + ["total", "min_per_leader", "kept"])
-    write_csv(args.spotcheck, sample, SPOTCHECK_FIELDS)
+    wrote_sample = write_spotcheck(args.spotcheck, sample, args.overwrite_spotcheck)
 
     originals = sum(1 for post in posts if post["post_type"] == "original")
     print(f"{len(posts)} posts, {originals} original. Coverage on original posts:\n")
     print(markdown_table(coverage_rows, actors, minimum))
-    print(f"\nWrote {args.out}, {args.coverage} and {len(sample)} spot-check rows to {args.spotcheck}")
+    print(f"\nWrote {args.out} and {args.coverage}")
+    if wrote_sample:
+        print(f"Wrote {len(sample)} spot-check rows to {args.spotcheck}")
+    else:
+        print(f"Kept the existing {args.spotcheck}; use --overwrite-spotcheck to draw a new sample")
     return 0
 
 

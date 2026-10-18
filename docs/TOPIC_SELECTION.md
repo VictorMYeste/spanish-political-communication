@@ -143,7 +143,7 @@ Step 5 of the rule assigns the X posts to the five selected topics and keeps a t
 The registry is `config/x_topic_keywords.json`, applied by `src/assign_x_topics.py`, as in the previous paper:
 
 * Spanish patterns per topic, chosen for precision over recall: a term must name the issue, not a mood or a party. Ambiguous words are left out, for example bare "fronteras" (also "abroad"), "precio" (often a metaphor), "mafia" (an insult) and "imputado" (judicial, not a corruption crime).
-* Text is matched after removing URLs and accents. A few phrases are removed first because they contain a topic word with another meaning ("cordón sanitario", homes damaged in floods or fires).
+* Text is matched after removing URLs and accents. A few phrases are removed first because they contain a topic word with another meaning ("cordón sanitario", "inquilino de la Moncloa", homes damaged or evacuated in floods and fires). Verb forms that only differ from a keyword by the accent ("paró", "empleó") are removed before the accents are.
 * A post gets a topic when exactly one topic matches, `review_needed` when several match, and `other` when none matches.
 * Only original posts count; quotes and replies are left out (decided on 18 October 2026).
 * `household_costs` has two keyword groups, housing and prices. The groups that matched are stored in `topic_groups`, so the topic can be split later.
@@ -157,35 +157,39 @@ The registry is `config/x_topic_keywords.json`, applied by `src/assign_x_topics.
 | | Health without "pandemia" and "hospitalari-" | "pandemia" was mostly a passing reference; "hospitalaria" also means hospitable |
 | | Economy adjectives only in fixed phrases ("situación/política/crisis económica"…), no "economías" | Passing mentions in obituaries and diplomatic calls |
 | | "pobreza energética" added to household costs | Standard term for households that cannot pay their energy bills |
+| 1.2.0 | "paró" and "empleó" removed before the accents | Without the accent they read as "paro" (unemployment) and "empleo" (employment); found as "quien paró el golpe" |
+| | "inquilino de la Moncloa" and evacuated homes ("abandonar/desalojar/evacuar… sus viviendas") removed before matching | Metaphor for the prime minister; homes left during wildfires |
 
-Version 1.1.0 was made after the first coverage run and after reading a sample of 100 matched posts (20 per topic). Because some leader × topic cells were close to the minimum, both runs are reported.
+Version 1.1.0 was made after the first coverage run and after reading a sample of 100 matched posts (20 per topic). Because some leader × topic cells were close to the minimum, both runs are reported. Version 1.2.0 fixes the three errors found in the manual spot check (see below); "empleó" was added because it collides with a keyword in the same way as "paró".
 
 ### Results
 
-Original posts (7,625), registry 1.1.0, with the counts of 1.0.0 in brackets:
+Original posts (7,625), registry 1.2.0, with the counts of 1.0.0 in brackets:
 
 | Topic | Feijóo | Sánchez | Abascal | Total | Kept |
 | --- | ---: | ---: | ---: | ---: | --- |
-| `economy_employment` | 102 (133) | 305 (403) | 30 (32) | 437 | yes |
-| `household_costs` | 96 (94) | 124 (119) | **11 (9)** | 231 | yes |
+| `economy_employment` | 100 (133) | 305 (403) | 30 (32) | 435 | yes |
+| `household_costs` | 95 (94) | 123 (119) | **11 (9)** | 229 | yes |
 | `health` | 56 (62) | 92 (104) | **4 (6)** | 152 | no |
 | `immigration_border` | 40 (40) | 50 (48) | 57 (57) | 147 | yes |
 | `corruption` | 128 (123) | 27 (27) | 117 (113) | 272 | yes |
 | `review_needed` | 33 | 55 | 32 | 120 | |
-| `other` | 2,577 | 2,642 | 1,047 | 6,266 | |
+| `other` | 2,580 | 2,643 | 1,047 | 6,270 | |
+
+Registry 1.2.0 differs from 1.1.0 by four posts (Feijóo −2 economy, −1 household; Sánchez −1 household); no Abascal cell changes.
 
 **Health is dropped.** Abascal has 4 original posts on it (13 if posts that also match another topic are counted).
 
-**Topics kept for RQ3:** `economy_employment`, `household_costs`, `immigration_border` and `corruption`. Together they cover 1,087 original posts (14.3%).
+**Topics kept for RQ3:** `economy_employment`, `household_costs`, `immigration_border` and `corruption`. Together they cover 1,083 original posts (14.2%).
 
 Two cells are thin and should be read with care:
 
 * **Abascal on household costs (11 posts).** The count is 9 with registry 1.0.0, 10 with the precision fixes alone, and 11 with "pobreza energética". On reading, 8 of the 11 are clearly about household costs and 3 mention energy or inflation inside a list of grievances; 7 are from 2022, during the inflation peak. Abascal does post about housing more often (26 original posts match the topic), but VOX usually links it to immigration ("la crisis de la vivienda sólo se arregla abordando también la política migratoria"), so those posts match two topics and go to `review_needed`. The topic passes the rule, but estimates by real author for this cell are weak.
-* **Sánchez on corruption (27 posts).** The head of government rarely raises corruption himself; most of his posts on it answer the PP.
+* **Sánchez on corruption (27 posts).** The head of government rarely raises corruption himself. In the spot-check sample, his posts on it point to the PP's own cases or announce anti-corruption measures.
 
 Each post is judged under all three names, so thin cells do not affect the attribution comparison itself, only the analyses by real author.
 
-Within `household_costs`, 132 posts match housing only, 92 prices only and 7 both.
+Within `household_costs`, 130 posts match housing only, 92 prices only and 7 both.
 
 ### Outputs
 
@@ -193,12 +197,32 @@ Within `household_costs`, 132 posts match housing only, 92 prices only and 7 bot
 | --- | --- |
 | `data/processed/x_topics.csv` | One row per post: topic, candidate topics, matched groups and matched terms |
 | `data/processed/x_topic_coverage.csv` | The coverage table above |
-| `data/processed/x_topic_spotcheck.csv` | 20 random original posts per topic (seed 20261018), with empty `is_correct` and `note` columns for the manual check |
+| `data/processed/x_topic_spotcheck.csv` | 20 random original posts per topic (seed 20261018), with the manual judgments `is_correct`, `is_main_topic` and `note` |
 
 ```bash
-python src/assign_x_topics.py
+python src/assign_x_topics.py                        # keeps an existing spot-check file
+python src/assign_x_topics.py --overwrite-spotcheck  # draws a new sample, losing the annotations
 ```
+
+### Spot check
+
+Víctor Yeste checked the 100 posts of `x_topic_spotcheck.csv` on 18 October 2026, one annotator. The sample was drawn with registry 1.1.0, before the fixes of 1.2.0, so the figures are those of the registry as it was checked; measuring 1.2.0 on the same sample would overstate its precision. Two criteria are reported:
+
+* **Word sense** (`is_correct`): the matched term is used in the sense of the topic.
+* **Main topic** (`is_main_topic`): the post is mainly about the topic, not a passing mention in a list or an insult. This is the stricter criterion and the relevant one for RQ3, where personas judge the position a post takes on its topic.
+
+| Topic | Word sense | Main topic |
+| --- | ---: | ---: |
+| `economy_employment` | 19/20 | 17/20 |
+| `household_costs` | 18/20 | 16/20 |
+| `immigration_border` | 20/20 | 19/20 |
+| `corruption` | 20/20 | 17/20 |
+| **Four kept topics** | **77/80 (96.25%)** | **69/80 (86.25%)** |
+
+Health was also checked (20/20 by word sense) but is not used, and was not judged by main topic.
+
+The three word-sense errors are fixed in registry 1.2.0: "paró el golpe" read as unemployment, "inquilino de la Moncloa" read as housing, and homes evacuated in a wildfire read as housing. The eight further main-topic errors are passing mentions that keywords cannot separate: "empleo" or "vivienda" in a list (an election result, a meeting with Macron, a list of laws, a pensions post), refugees in a post about UNRWA and Gaza, and "corrupto" or "corrupción" in posts about the DANA, the Hamas war and immigration. The `note` column explains each one.
 
 ### Status
 
-The topics stay provisional until the manual spot check of `x_topic_spotcheck.csv` (about 15 minutes; health can be skipped). The precision figures for the paper come from that check.
+The topics for RQ3 are final: `economy_employment`, `household_costs`, `immigration_border` and `corruption`.

@@ -112,7 +112,23 @@ def test_spotcheck_sample_is_reproducible_and_original_only():
         ("Más inversión en atención primaria", "health"),
         ("La trama de Koldo y Ábalos", "corruption"),
         ("Más empleo y mejores viviendas", "review_needed"),
+        ("Hay que reconciliar a los españoles con quien paró el golpe", "other"),
+        ("El Gobierno empleó todos los medios", "other"),
+        ("Los intereses del inquilino de la Moncloa", "other"),
+        ("Solidaridad con quienes han tenido que abandonar sus viviendas", "other"),
+        ("Bajar los precios del alquiler para los inquilinos", "household_costs"),
     ],
 )
 def test_project_registry_examples(project, text, expected):
     assert assign.assign(project.match(text)) == expected
+
+
+def test_write_spotcheck_keeps_an_existing_file(tmp_path):
+    path = tmp_path / "spotcheck.csv"
+    path.write_text("annotated\n", encoding="utf-8")
+    row = {field: "" for field in assign.SPOTCHECK_FIELDS}
+
+    assert assign.write_spotcheck(path, [row], overwrite=False) is False
+    assert path.read_text(encoding="utf-8") == "annotated\n"
+    assert assign.write_spotcheck(path, [row], overwrite=True) is True
+    assert path.read_text(encoding="utf-8").startswith("topic,message_id")
