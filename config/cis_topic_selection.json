@@ -1,0 +1,61 @@
+{
+  "version": "1.0.0",
+  "fixed_on": "2026-10-18",
+  "description": "Rule for selecting the RQ3 topics from the CIS monthly barometers. Fixed before the CIS data were downloaded. Rationale in docs/TOPIC_SELECTION.md.",
+  "source": {
+    "survey": "CIS Barómetro (monthly)",
+    "question": "¿Cuál es, a su juicio, el principal problema que existe actualmente en España? ¿Y el segundo? ¿Y el tercero? (RESPUESTA ESPONTÁNEA). (MULTIRRESPUESTA).",
+    "measure": "TOTAL column: percentage of respondents who name the category as any of their three problems",
+    "study_page": "https://www.cis.es/es/estudios/barometro-de-{month}-{year}"
+  },
+  "window": {
+    "first_month": "2022-04",
+    "last_month": "2026-10"
+  },
+  "aggregation": {
+    "within_barometer": "sum of the TOTAL percentages of the categories mapped to the topic; a category missing from a barometer counts as 0",
+    "across_barometers": "mean over all barometers in the window",
+    "ranking": "descending mean"
+  },
+  "top_k": 5,
+  "min_original_posts_per_leader": 10,
+  "exclusions": [
+    {"pattern": "problemas politicos en general", "group": "political"},
+    {"pattern": "el gobierno y partidos", "group": "political"},
+    {"pattern": "mal comportamiento de los", "group": "political"},
+    {"pattern": "lo que hacen los partidos", "group": "political"},
+    {"pattern": "falta de acuerdos", "group": "political"},
+    {"pattern": "falta de confianza en los", "group": "political"},
+    {"pattern": "funcionamiento de la democracia", "group": "political"},
+    {"pattern": "la clase politica", "group": "political"},
+    {"pattern": "los extremismos", "group": "political"},
+    {"pattern": "crisis de valores", "group": "diffuse"},
+    {"pattern": "problemas de indole social", "group": "diffuse"},
+    {"pattern": "incertidumbres ante el futuro", "group": "diffuse"},
+    {"pattern": "poca conciencia ciudadana", "group": "diffuse"},
+    {"pattern": "crispacion social", "group": "diffuse"},
+    {"pattern": "^otras respuestas$", "group": "non_substantive"},
+    {"pattern": "^ninguno$", "group": "non_substantive"},
+    {"pattern": "^n\\.s\\.$", "group": "non_substantive"},
+    {"pattern": "^n\\.c\\.$", "group": "non_substantive"},
+    {"pattern": "^\\(n\\)$", "group": "non_substantive"}
+  ],
+  "exclusion_groups": {
+    "political": "Names the political class, the parties, the government or the state of politics as the problem, not a policy area. Leaders' posts of this kind go to the residual category.",
+    "diffuse": "No identifiable policy area that a keyword registry could match.",
+    "non_substantive": "Not a problem category."
+  },
+  "mapping": {
+    "household_costs": ["^la vivienda$", "tarifas energeticas", "crisis energetica", "subida de (los )?precios", "inflacion", "coste de la vida"],
+    "economy_employment": ["crisis economica", "problemas de indole economica", "^el paro$", "calidad del empleo"],
+    "immigration_border": ["^la inmigracion$", "crisis con marruecos", "fronteras de ceuta"],
+    "corruption": ["corrupcion"],
+    "health": ["^la sanidad$", "peligros para la salud", "covid", "coronavirus"],
+    "foreign_policy_war": ["ucrania", "las guerras en general", "politica exterior", "oriente proximo", "israel", "gaza", "palestin"],
+    "territorial_model": ["nacionalismos", "estatutos de autonomia", "independencia de cataluna", "amnistia"],
+    "environment_emergencies": ["medio ambiente", "cambio climatico", "incendios", "\\bdana\\b", "inundaciones", "sequia", "apagon"],
+    "gender_equality": ["violencia de genero"],
+    "judiciary": ["administracion de justicia"]
+  },
+  "matching": "Patterns are Python regular expressions searched in the category label after lower-casing, removing accents and collapsing whitespace. Exclusions are checked first, then the topics in the order listed, and the first match wins. A category that matches no exclusion and no mapping competes on its own under its CIS label."
+}
