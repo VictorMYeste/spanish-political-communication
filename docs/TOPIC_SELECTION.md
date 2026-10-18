@@ -134,6 +134,71 @@ The three topics proposed by the team (household costs, immigration and corrupti
 
 The result depends on one decision: merging the economy, unemployment and job quality into one topic. That merge was part of the rule fixed before the download (commit `9b5c035`), and it matches the keyword registry, where the three are hard to separate in short posts.
 
-### Next step
+## Coverage in the posts
 
-Coverage (rule step 5) needs the keyword registry for the five selected topics. A topic is kept only if each leader has at least 10 original posts on it.
+Step 5 of the rule assigns the X posts to the five selected topics and keeps a topic only if each leader has at least 10 original posts on it.
+
+### Keyword registry
+
+The registry is `config/x_topic_keywords.json`, applied by `src/assign_x_topics.py`, as in the previous paper:
+
+* Spanish patterns per topic, chosen for precision over recall: a term must name the issue, not a mood or a party. Ambiguous words are left out, for example bare "fronteras" (also "abroad"), "precio" (often a metaphor), "mafia" (an insult) and "imputado" (judicial, not a corruption crime).
+* Text is matched after removing URLs and accents. A few phrases are removed first because they contain a topic word with another meaning ("cordón sanitario", homes damaged in floods or fires).
+* A post gets a topic when exactly one topic matches, `review_needed` when several match, and `other` when none matches.
+* Only original posts count; quotes and replies are left out (decided on 18 October 2026).
+* `household_costs` has two keyword groups, housing and prices. The groups that matched are stored in `topic_groups`, so the topic can be split later.
+
+### Registry versions
+
+| Version | Change | Why |
+| --- | --- | --- |
+| 1.0.0 | First draft | |
+| 1.1.0 | Phrases removed before matching: "cordón sanitario", homes damaged in floods or fires | False matches in health and household costs |
+| | Health without "pandemia" and "hospitalari-" | "pandemia" was mostly a passing reference; "hospitalaria" also means hospitable |
+| | Economy adjectives only in fixed phrases ("situación/política/crisis económica"…), no "economías" | Passing mentions in obituaries and diplomatic calls |
+| | "pobreza energética" added to household costs | Standard term for households that cannot pay their energy bills |
+
+Version 1.1.0 was made after the first coverage run and after reading a sample of 100 matched posts (20 per topic). Because some leader × topic cells were close to the minimum, both runs are reported.
+
+### Results
+
+Original posts (7,625), registry 1.1.0, with the counts of 1.0.0 in brackets:
+
+| Topic | Feijóo | Sánchez | Abascal | Total | Kept |
+| --- | ---: | ---: | ---: | ---: | --- |
+| `economy_employment` | 102 (133) | 305 (403) | 30 (32) | 437 | yes |
+| `household_costs` | 96 (94) | 124 (119) | **11 (9)** | 231 | yes |
+| `health` | 56 (62) | 92 (104) | **4 (6)** | 152 | no |
+| `immigration_border` | 40 (40) | 50 (48) | 57 (57) | 147 | yes |
+| `corruption` | 128 (123) | 27 (27) | 117 (113) | 272 | yes |
+| `review_needed` | 33 | 55 | 32 | 120 | |
+| `other` | 2,577 | 2,642 | 1,047 | 6,266 | |
+
+**Health is dropped.** Abascal has 4 original posts on it (13 if posts that also match another topic are counted).
+
+**Topics kept for RQ3:** `economy_employment`, `household_costs`, `immigration_border` and `corruption`. Together they cover 1,087 original posts (14.3%).
+
+Two cells are thin and should be read with care:
+
+* **Abascal on household costs (11 posts).** The count is 9 with registry 1.0.0, 10 with the precision fixes alone, and 11 with "pobreza energética". On reading, 8 of the 11 are clearly about household costs and 3 mention energy or inflation inside a list of grievances; 7 are from 2022, during the inflation peak. Abascal does post about housing more often (26 original posts match the topic), but VOX usually links it to immigration ("la crisis de la vivienda sólo se arregla abordando también la política migratoria"), so those posts match two topics and go to `review_needed`. The topic passes the rule, but estimates by real author for this cell are weak.
+* **Sánchez on corruption (27 posts).** The head of government rarely raises corruption himself; most of his posts on it answer the PP.
+
+Each post is judged under all three names, so thin cells do not affect the attribution comparison itself, only the analyses by real author.
+
+Within `household_costs`, 132 posts match housing only, 92 prices only and 7 both.
+
+### Outputs
+
+| Output | Content |
+| --- | --- |
+| `data/processed/x_topics.csv` | One row per post: topic, candidate topics, matched groups and matched terms |
+| `data/processed/x_topic_coverage.csv` | The coverage table above |
+| `data/processed/x_topic_spotcheck.csv` | 20 random original posts per topic (seed 20261018), with empty `is_correct` and `note` columns for the manual check |
+
+```bash
+python src/assign_x_topics.py
+```
+
+### Status
+
+The topics stay provisional until the manual spot check of `x_topic_spotcheck.csv` (about 15 minutes; health can be skipped). The precision figures for the paper come from that check.
