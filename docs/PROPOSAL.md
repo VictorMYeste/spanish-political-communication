@@ -99,7 +99,7 @@ Other leaders (Sumar once it has a leader, Podemos, ERC, Junts, EH Bildu, PNV) c
 
 The final set is a small number of issues that are salient in Spain during the study period. Each topic must be frequent enough in the data and discussed by all three leaders, so that the leaders are compared on similar messages. This serves two purposes: differences between leaders do not simply reflect that they discuss different issues, and RQ3 can test whether the attribution effect appears across topics or only for particular issues. CIS items are no longer a selection criterion (§9).
 
-Starting set agreed at the meeting:
+Starting set proposed at the meeting:
 
 | Topic | Examples of expected content |
 | --- | --- |
