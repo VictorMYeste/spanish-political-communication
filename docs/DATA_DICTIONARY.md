@@ -83,7 +83,7 @@ Output files: `data/processed/congreso_stimuli.csv`, `data/processed/x_stimuli.c
 | `author_role` | Role shown to the model |
 | `source_type` | As in the internal table |
 | `topic` | Canonical topic, `other`, or `review_needed` |
-| `keep_for_prompt` | `True` only after quality, topic and anonymization checks. X: `True` for the posts drawn by `src/sample_x_stimuli.py` |
+| `keep_for_prompt` | `True` only after quality, topic and anonymization checks. X: `True` for the posts selected by `src/sample_x_stimuli.py` |
 | `is_morally_relevant` | Moral-relevance filter output. X: empty with the next two columns, because the filter is not used (`docs/PROPOSAL.md`, section 6) |
 | `dominant_moral_dimension` | Highest-scoring moral foundation |
 | `moral_max` | Score of the dominant dimension |
