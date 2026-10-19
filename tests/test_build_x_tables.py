@@ -177,18 +177,23 @@ def test_missing_referenced_text_is_counted(tmp_path):
 
 
 def test_stimulus_rows_and_csv_columns(tmp_path):
+    row = {
+        "message_id": "x_100",
+        "post_id": "100",
+        "bundle_id": "",
+        "text": "Texto",
+        "date": "2024-05-02",
+        "author_role": "",
+        "source_type": "x_post",
+        "post_type": "original",
+    }
     rows = [
-        {
-            "message_id": "x_100",
-            "post_id": "100",
-            "bundle_id": "",
-            "text": "Texto",
-            "date": "2024-05-02",
-            "author_role": "",
-            "source_type": "x_post",
-        }
+        row,
+        {**row, "message_id": "x_101", "post_id": "101", "post_type": "quote"},
+        {**row, "message_id": "x_102", "post_id": "102", "post_type": "reply"},
     ]
     stimuli = build.stimulus_rows(rows)
+    assert [item["message_id"] for item in stimuli] == ["x_100"]
     assert list(stimuli[0]) == build.STIMULUS_FIELDS
     assert stimuli[0]["tweet_id"] == "100"
     assert stimuli[0]["text_anon"] == "Texto"

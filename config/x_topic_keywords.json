@@ -1,0 +1,100 @@
+{
+  "version": "1.2.0",
+  "updated": "2026-10-18",
+  "description": "Keyword registry for the RQ3 topics selected in docs/TOPIC_SELECTION.md. High precision over recall: terms must name the issue, not a mood or a party.",
+  "changes": [
+    "1.1.0 (2026-10-18, after the first coverage run and a 100-post spot check): precision fixes for all topics (exclude_phrases; health without 'pandemia' and 'hospitalari-'; economy adjectives only in fixed phrases, no 'economias') and 'pobreza energetica' added to household_costs. Before/after counts in docs/TOPIC_SELECTION.md.",
+    "1.2.0 (2026-10-18, after the manual spot check): accented verb forms removed before accents are stripped ('paró', 'empleó'), and 'inquilino de la Moncloa' and evacuated homes added to exclude_phrases."
+  ],
+  "normalization": "URLs removed, lower-cased, exclude_accented removed, accents removed, whitespace collapsed, exclude_phrases removed. Each group is compiled as \\b(?:p1|p2|...)\\b and searched in the normalized text.",
+  "exclude_accented": [
+    "paró",
+    "empleó"
+  ],
+  "exclude_phrases": [
+    "cordon sanitario",
+    "inquilin[oa]s? de (la )?moncloa",
+    "(abandon|desaloj|evacu)\\w* (de )?(sus |las |su |la )?viviendas?",
+    "viviendas (afectadas|danadas|destruidas|desalojadas|evacuadas|inundadas|arrasadas|quemadas)"
+  ],
+  "assignment": "A post gets a topic when exactly one topic matches, review_needed when several match, and other when none matches.",
+  "topics": [
+    {
+      "topic": "economy_employment",
+      "cis_categories": ["La crisis económica, los problemas de índole económica", "El paro", "Los problemas relacionados con la calidad del empleo"],
+      "rationale": "Growth, unemployment, jobs and wages. Taxes and pensions are separate CIS categories and are left out; prices and inflation belong to household_costs.",
+      "groups": {
+        "economy": [
+          "economia", "(crisis|situacion|politica|politicas|recuperacion|actividad|gestion|datos|indicadores|crecimiento|desarrollo|modelo|estabilidad) economic[oa]s?", "pib", "recesion",
+          "deuda publica", "deficit (publico)?", "prima de riesgo", "productividad"
+        ],
+        "employment": [
+          "paro", "parados", "desempleo", "desemplead[oa]s", "empleo(s)?", "puestos de trabajo",
+          "afiliad[oa]s", "afiliacion", "contratos? (indefinidos?|temporales?|fijos?)", "temporalidad", "precariedad",
+          "reforma laboral", "mercado laboral", "salario(s)?", "salarial(es)?", "smi", "sueldos?",
+          "jornada laboral", "reduccion de (la )?jornada", "autonomos"
+        ]
+      }
+    },
+    {
+      "topic": "household_costs",
+      "cis_categories": ["La vivienda", "La subida de tarifas energéticas, crisis energética"],
+      "rationale": "What households pay: housing and the cost of living. Squatting is property and security, not cost, and is left out.",
+      "groups": {
+        "housing": [
+          "vivienda(s)?", "alquiler(es)?", "alquilar", "hipoteca(s)?", "hipotecari[oa]s?", "inquilin[oa]s?",
+          "desahucios?", "pisos? turisticos?", "emancipa(cion|rse)", "parque publico de vivienda"
+        ],
+        "prices": [
+          "(coste|costo) de la vida", "inflacion", "subida de (los )?precios", "carestia", "ipc",
+          "(precio|precios|factura|facturas|recibo|tarifa|tarifas) de (la luz|la electricidad|la energia|el gas|los alimentos|la cesta|la compra|los carburantes|la gasolina|el combustible)",
+          "cesta de la compra", "poder adquisitivo", "pobreza energetica", "(llegar|llegan|llega) a fin de mes", "crisis energetica",
+          "tope (al precio )?del gas", "excepcion iberica", "iva de (los )?alimentos", "iva de la luz", "bono social",
+          "abonos? (unico|de transporte|transporte)", "gratuidad del transporte"
+        ]
+      }
+    },
+    {
+      "topic": "health",
+      "cis_categories": ["La sanidad", "Los peligros para la salud: COVID-19"],
+      "rationale": "The health system and public health, including the pandemic.",
+      "groups": {
+        "health": [
+          "sanidad", "sanitari[oa]s?", "salud publica", "salud mental", "sistema (nacional )?de salud",
+          "hospital(es)?", "centros? de salud", "atencion primaria", "listas? de espera",
+          "medic[oa]s", "enfermer[oa]s?", "pacientes?", "urgencias", "covid(-?19)?", "coronavirus",
+          "vacuna(s|cion)?", "cancer", "ley ela", "enfermos de ela", "medicamentos?", "farmaceutic[oa]s?", "muface"
+        ]
+      }
+    },
+    {
+      "topic": "immigration_border",
+      "cis_categories": ["La inmigración", "Crisis con Marruecos. Fronteras de Ceuta y Melilla"],
+      "rationale": "Immigration, asylum and border control. Bare 'fronteras' is left out because it also means 'abroad'.",
+      "groups": {
+        "immigration": [
+          "inmigra\\w*", "migra(nte|ntes|cion|ciones|torio|toria|torios|torias)", "remigracion",
+          "(control|proteccion|defensa|vigilancia|seguridad|blindaje|cierre|apertura) de (las |nuestras )?fronteras?",
+          "fronteras? (abiertas?|sur|exteriores?)", "(abren|abrir|abre|abrieron|cerrar|cierren|proteger|defender|blindar|controlar) (las |nuestras )?fronteras",
+          "frontex", "pateras?", "cayucos?", "menas", "menores (extranjeros )?no acompanados", "(peticion|solicitud|solicitudes|solicitantes|demandantes|derecho) de asilo",
+          "refugiad[oa]s?", "deportac(ion|iones)", "repatriac(ion|iones)", "efecto llamada", "llegadas? (irregulares?|masivas?|ilegales?)",
+          "regularizacion (masiva|extraordinaria)", "extranjeria", "centros? de internamiento", "reagrupacion familiar", "salto a la valla"
+        ]
+      }
+    },
+    {
+      "topic": "corruption",
+      "cis_categories": ["La corrupción y el fraude"],
+      "rationale": "Corruption crimes and the main corruption cases of the period. Judicial terms without a corruption crime (imputado, banquillo) are left out.",
+      "groups": {
+        "corruption": [
+          "corrup\\w*", "soborn\\w*", "cohecho", "malversacion", "prevaricacion", "trafico de influencias",
+          "mordidas?", "comisiones ilegales", "comisionistas?", "blanqueo de capitales", "financiacion ilegal", "caja b",
+          "contratos amanados", "(caso|comisiones|negocio|trama) (de las )?mascarillas", "koldo", "abalos", "cerdan", "aldama",
+          "gurtel", "kitchen", "barcenas", "punica", "lezo", "montoro", "(caso|caso de los) eres", "eres de andalucia",
+          "begona gomez", "hermano (de sanchez|del presidente)"
+        ]
+      }
+    }
+  ]
+}

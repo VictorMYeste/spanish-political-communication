@@ -87,9 +87,9 @@ Other leaders (Sumar once it has a leader, Podemos, ERC, Junts, EH Bildu, PNV) c
 
 1. **Collection.** Raw API responses stored untouched, with query manifests (`docs/X_SCRIPTS.md`).
 2. **Normalisation.** Shared internal and stimuli tables per source (`docs/DATA_DICTIONARY.md`).
-3. **Quality filters.** Remove retweets (already excluded at query time), decode HTML entities, remove URLs, normalise whitespace, drop very short or low-information posts. **[open]** Keep replies and quote posts, or keep only original posts. Replies and quotes are collected either way and filtered here.
+3. **Quality filters.** Remove retweets (already excluded at query time), decode HTML entities, remove URLs, normalise whitespace, drop very short or low-information posts. Only original posts are used: quotes and replies depend on another author's text, which would either be missing from the stimulus or add a second, often identifiable, author. They stay in the internal table for context but do not become stimuli.
 4. **Moral relevance.** ME2-BERT, if it supports Spanish. **[open]** Otherwise a multilingual alternative or translation, validated on a manually annotated sample.
-5. **Topic assignment.** Spanish high-precision keyword registry, exactly-one-match rule, `review_needed` for multi-topic hits, as in the previous paper.
+5. **Topic assignment.** Spanish high-precision keyword registry (`config/x_topic_keywords.json`), exactly-one-match rule, `review_needed` for multi-topic hits, as in the previous paper. Results and spot check in [TOPIC_SELECTION.md](TOPIC_SELECTION.md).
 6. **Anonymization.** Replace actor names and nicknames, party names and acronyms, campaign slogans and hashtags, and user handles with placeholders (`[POLITICAL_ACTOR]`, `[PARTY]`, `[CAMPAIGN_TAG]`, `[USER]`). Check for identity leaks, degradation and context dependence. The anonymized text is shown in all four conditions.
 7. **Attribution conditions.** The no-author condition shows the anonymized post with a neutral role. Each attributed condition shows the same text with one leader named as its author. **[open]** How the speaker is named (name only, or name and party), and whether institutional roles such as "President of the Government" are shown, since they identify Sánchez.
 8. **Cross-attribution checks [open].** Some posts identify their author through their content (e.g., "mi Gobierno", references to the speaker's own party or past acts), so they cannot plausibly be attributed to another leader. Decide whether to filter them or restrict their attributions. A leakage probe, asking the model to guess the author of the no-author version, would measure how anonymous that condition really is.
@@ -97,26 +97,18 @@ Other leaders (Sumar once it has a leader, Podemos, ERC, Junts, EH Bildu, PNV) c
 
 ## 7. Topics
 
-The final set is a small number of issues that are salient in Spain during the study period. Each topic must be frequent enough in the data and discussed by all three leaders, so that the leaders are compared on similar messages. This serves two purposes: differences between leaders do not simply reflect that they discuss different issues, and RQ3 can test whether the attribution effect appears across topics or only for particular issues. CIS items are no longer a selection criterion (§9).
+The final set is a small number of issues that are salient in Spain during the study period. Each topic must be frequent enough in the data and discussed by all three leaders, so that the leaders are compared on similar messages. This serves two purposes: differences between leaders do not simply reflect that they discuss different issues, and RQ3 can test whether the attribution effect appears across topics or only for particular issues. The topics are selected by their salience in the CIS monthly barometers and their coverage in the posts; the rule and its results are in [TOPIC_SELECTION.md](TOPIC_SELECTION.md). The CIS is not used as a topic-level benchmark (§9).
 
-Starting set agreed at the meeting:
+Final set, selected by the rule on 18 October 2026:
 
-| Topic | Examples of expected content |
+| Topic | Content |
 | --- | --- |
-| `immigration_border` | arrivals, the situation in Ceuta, regularisation, unaccompanied minors, border control |
-| `housing_rents` | access to housing, rising rents, housing policy |
-| `economy_cost_of_living` | prices, wages, employment, taxes, pensions |
+| `economy_employment` | growth, unemployment, jobs and wages |
+| `household_costs` | housing, rents, energy bills and the cost of living |
+| `immigration_border` | arrivals, asylum, regularisation, unaccompanied minors, border control |
+| `corruption` | corruption crimes and cases |
 
-Further candidates, kept only if they meet the same criteria **[open]**:
-
-| Topic | Examples of expected content |
-| --- | --- |
-| `judiciary_rule_of_law` | judges, courts, Constitutional Court, Attorney General, "lawfare" |
-| `corruption` | corruption investigations and accountability |
-| `territorial_model` | Catalonia, amnesty, regional financing |
-| `foreign_policy_defence` | Ukraine, Gaza, NATO, defence spending, trade and tariffs |
-| `gender_equality` | feminism, gender violence, equality policies |
-| `emergencies_climate` | floods, wildfires, energy, climate policy |
+The meeting had proposed immigration, housing and the economy and cost of living as examples, and corruption was proposed later. The rule confirms them, with housing and the cost of living as one topic and the economy and employment as another. Health ranks third in the CIS but is dropped because Abascal has only 4 original posts on it.
 
 ## 8. Personas
 
@@ -188,16 +180,14 @@ Decided at the meeting of 2026-10-07:
 * Personas are grouped by elicited ideological self-placement, which is never shown to them when they judge messages.
 * CIS is used to compare the ordering of leader preferences by ideological group, not topic-level distributions.
 
-Decided earlier: collection window from April 2022 (collected); preprint in mid-November 2026 and ARR submission targeting ACL 2027.
+Decided earlier: collection window from April 2022 (collected); preprint in mid-November 2026 and ARR submission targeting ACL 2027; original posts only, without replies and quotes (§6); final topic set (§7).
 
 Still open:
 
-1. Replies and quote posts: keep or drop (§6).
-2. Analysis window and election periods (§5).
-3. How the speaker is named in the attributed conditions, and which author role each condition shows (§6).
-4. Cross-attribution plausibility filter and leakage probe (§6).
-5. Unit of judgment: single post or also bundles (§6).
-6. Final topic set (§7).
-7. Persona sampling, frame of reference, elicitation stability, additional CIS items and group cut-offs (§8).
-8. CIS waves (§9).
-9. Prompt language, and the second model if RQ6 is run (§10).
+1. Analysis window and election periods (§5).
+2. How the speaker is named in the attributed conditions, and which author role each condition shows (§6).
+3. Cross-attribution plausibility filter and leakage probe (§6).
+4. Unit of judgment: single post or also bundles (§6).
+5. Persona sampling, frame of reference, elicitation stability, additional CIS items and group cut-offs (§8).
+6. CIS waves (§9).
+7. Prompt language, and the second model if RQ6 is run (§10).
