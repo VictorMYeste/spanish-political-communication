@@ -78,12 +78,12 @@ Output files: `data/processed/congreso_stimuli.csv`, `data/processed/x_stimuli.c
 | `tweet_id` | Message identifier used by the prompting code. X: post ID. Congreso: `message_id` |
 | `message_id` | Same as in the internal table |
 | `bundle_id` | Bundle identifier, empty until bundling |
-| `text_anon` | Text after anonymization |
+| `text_anon` | Text after anonymization. X: cleaned and anonymized by `src/prepare_x_stimuli.py` |
 | `date` | Local date (`YYYY-MM-DD`) |
 | `author_role` | Role shown to the model |
 | `source_type` | As in the internal table |
 | `topic` | Canonical topic, `other`, or `review_needed` |
-| `keep_for_prompt` | `True` only after quality, topic and anonymization checks |
+| `keep_for_prompt` | `True` only after quality, topic and anonymization checks. X: `True` for the posts drawn by `src/sample_x_stimuli.py` |
 | `is_morally_relevant` | Moral-relevance filter output |
 | `dominant_moral_dimension` | Highest-scoring moral foundation |
 | `moral_max` | Score of the dominant dimension |

@@ -1,0 +1,127 @@
+{
+  "version": "1.0.0",
+  "updated": "2026-10-19",
+  "description": "Quality filters (step 3), anonymization (step 6) and cross-attribution check (step 8) for the X stimuli, docs/PROPOSAL.md section 6. Results in docs/STIMULI.md.",
+  "quality": {
+    "min_chars": 40,
+    "min_alpha_tokens": 7,
+    "note": "Thresholds of the previous paper (filter_spec 1.2.0), counted on the cleaned text. Its exact low-information list ('thank you', 'so true'...) is not needed: such texts are already below 7 words. Its truncation flag ('...') is not used: X API v2 returns the full text, including long posts, and in Spanish the ellipsis is usually stylistic."
+  },
+  "anonymization": {
+    "note": "As in the previous paper: the leaders and their parties are replaced, campaign tags too, institutions keep a plain name, and every other account becomes [USER]. Other politicians' names stay in the text. Order: hashtags, accounts, leader names, party names. Name patterns are case-insensitive and accept missing accents.",
+    "actor_handles": ["sanchezcastejon", "NunezFeijoo", "Santi_ABASCAL"],
+    "party_handle_pattern": "^(pp|gpp|psoe|psc|psdeg|pspv|psib|psn|pse|psocialista|socialist|gpsocialista|vox|gpvox)|psoe|vox_|ppopular|socialist",
+    "party_handles": ["epp", "eppgroup", "patriotseu", "patriotsep", "ecrparty", "ecrgroup", "soc_intl", "pes_pse"],
+    "institution_handles": {
+      "congreso_es": "Congreso de los Diputados",
+      "senadoesp": "Senado",
+      "un": "ONU",
+      "onu_es": "ONU",
+      "nato": "OTAN",
+      "umegob": "UME",
+      "guardiacivil": "Guardia Civil",
+      "policia": "Policía Nacional",
+      "proteccioncivil": "Protección Civil",
+      "aemet_esp": "AEMET",
+      "casareal": "Casa Real",
+      "eu_commission": "Comisión Europea",
+      "eucouncil": "Consejo de la UE",
+      "eucopresident": "presidente del Consejo Europeo",
+      "europarl_es": "Parlamento Europeo",
+      "eib": "BEI",
+      "who": "OMS",
+      "unicef": "UNICEF",
+      "unicef_es": "UNICEF",
+      "unesco": "UNESCO",
+      "unrwa": "UNRWA",
+      "aecid_es": "AECID",
+      "mitecogob": "Ministerio para la Transición Ecológica",
+      "minpres": "Ministerio de la Presidencia",
+      "sanidadgob": "Ministerio de Sanidad",
+      "interiorgob": "Ministerio del Interior",
+      "maecgob": "Ministerio de Asuntos Exteriores"
+    },
+    "campaign_hashtag_pattern": "sanchez|sanchis|feijoo|abascal|psoe|vox|socialis|ppopular|partidopopular|(^|vota|equipo|nacional|interparlamentaria)pp",
+    "campaign_hashtags": {
+      "pp": ["eselmomento", "galiciafunciona", "entretodos", "tocacambio", "espananoserinde", "tuvotoeslarespuesta", "somoslasolucion", "porunaeuskadiabierta", "tuvototieneungranpapel", "cumplirconlapalabra", "eleccionesya", "tomapartidoporespana", "unaespanafuerte", "tuvotolocambiatodo", "preparados", "queespanadecida", "turespuesta", "politicaquesirve", "elcambioestamascerca", "latrama", "eppsummit", "epp2024"],
+      "psoe": ["elgobiernodelagente", "espanaavanza", "adelante", "siempreadelante", "gobernamoscontigo", "lamejorespana", "defiendeloquepiensas", "espanagobierna", "votaloquepiensas", "loquevotasimporta", "espanaadelantaporlaizquierda", "gobernarparatransformar_", "elrosaesmasqueuncolor", "andaluciaquieremas", "destavaibesteiro", "40del82"],
+      "vox": ["sentidocomun", "votasentidocomun", "votaloqueimporta", "decideloqueimporta", "endefensapropia", "espanadecide", "nosvanaoir", "viva22", "viva24", "patriots", "votaseguro", "cambioreal", "prioridadnacional", "cuidalotuyo", "sabesqueesverdad", "ejercitoya"]
+    },
+    "campaign_hashtag_note": "Chosen by hand from the 203 hashtags used at least 3 times: party slogans and party events used almost only by one leader. Content, places, dates and institutional events stay (#DANA, #COP28, #23J, #CMin).",
+    "actor_patterns": [
+      "pedro s[aá]nchez(?: p[eé]rez[- ]castej[oó]n)?",
+      "s[aá]nchez(?: p[eé]rez[- ]castej[oó]n)?",
+      "p[eé]rez[- ]castej[oó]n",
+      "\\w*sanchis\\w*",
+      "alberto n[uú][ñn]ez feij[oó][oó]",
+      "n[uú][ñn]ez feij[oó][oó]",
+      "feij[oó][oó]",
+      "santiago abascal(?: conde)?",
+      "abascal(?: conde)?"
+    ],
+    "party_patterns": [
+      "partido socialista obrero espa[ñn]ol",
+      "partido socialista",
+      "partido popular europeo",
+      "partido popular",
+      "psoe",
+      "pp",
+      "ppe",
+      "ppdeg",
+      "vox",
+      "psc",
+      "psdeg",
+      "pspv",
+      "psib",
+      "pse"
+    ],
+    "leak_pattern": "sanchez|sanchis|castejon|feijoo|abascal|psoe|partido popular|partido socialista|\\bpp\\b|\\bvox\\b",
+    "degraded": {"min_chars": 40, "min_words": 7, "short_text_chars": 80, "max_placeholders_in_short_text": 3},
+    "degraded_note": "Thresholds of the previous paper, on the anonymized text. Placeholders do not count as words."
+  },
+  "role_markers": {
+    "normalization": "As in config/x_topic_keywords.json: URLs removed, lower-cased, accents removed, whitespace collapsed, exclude_phrases removed. Each group is compiled as \\b(?:p1|p2|...)\\b.",
+    "exclude_phrases": [
+      "primer(a|os|as)? ministr[oa]s?",
+      "gobiernos? (autonomic[oa]s?|regional(es)?|municipal(es)?|local(es)?|provincial(es)?|gallego|andaluz|vasco|catalan|valenciano|canario|balear|madrileno|aragones|extremeno|murciano|navarro|riojano|cantabro|asturiano|federal|britanico|aleman|frances|italiano|portugues|ucraniano|israeli|marroqui|venezolano|argentino|chino|ruso|estadounidense|norteamericano)",
+      "gobiernos? (de|del|en) (la )?(galicia|xunta|andalucia|junta|madrid|comunidad|aragon|extremadura|valencia|comunitat|castilla|murcia|canarias|baleares|cantabria|rioja|navarra|euskadi|pais vasco|cataluna|generalitat|asturias|ceuta|melilla|ayuntamiento|israel|marruecos|venezuela|ucrania|eeuu|estados unidos|francia|italia|alemania|portugal|argentina|mexico|chile|colombia|brasil|china|rusia|hungria|polonia|reino unido|grecia)"
+    ],
+    "groups": [
+      {
+        "group": "government_voice",
+        "authors": ["pedro_sanchez"],
+        "implausible_under": ["alberto_nunez_feijoo", "santiago_abascal"],
+        "why": "Speaks as or for the Spanish Government, which only the head of government can do.",
+        "patterns": ["gobierno", "ministr[oa]s?", "ministerio", "consejo de ministros", "presidente del gobierno", "presidencia espanola", "homolog[oa]s?", "visita oficial", "consejo europeo", "cumbres?"]
+      },
+      {
+        "group": "against_government",
+        "authors": ["alberto_nunez_feijoo", "santiago_abascal"],
+        "implausible_under": ["pedro_sanchez"],
+        "why": "Opposes the Government or its head, which Sanchez would be opposing himself. Naming Sanchez counts: in these authors' posts it is almost always an attack on him, and anonymization hides the name but not the target ('su Gobierno', 'su mujer').",
+        "patterns": ["gobierno", "ministr[oa]s?", "ministerio", "consejo de ministros", "presidente del gobierno", "sanchez", "sanchis(mo|ta|tas)", "dimision(es)?", "dimita", "dimitir", "dimite", "mocion de censura"]
+      },
+      {
+        "group": "against_right",
+        "authors": ["pedro_sanchez"],
+        "implausible_under": ["alberto_nunez_feijoo", "santiago_abascal"],
+        "why": "Attacks the right, the camp of the other two leaders.",
+        "patterns": ["ultraderecha", "extrema derecha", "(la|las) derechas?", "reaccionari[oa]s?"]
+      },
+      {
+        "group": "against_left",
+        "authors": ["alberto_nunez_feijoo", "santiago_abascal"],
+        "implausible_under": ["pedro_sanchez"],
+        "why": "Attacks the left, Sanchez's camp. 'Socialista' is left out: Feijoo also uses it in condolences.",
+        "patterns": ["izquierdas?", "comunistas?", "socialcomunis\\w*", "progres"]
+      },
+      {
+        "group": "against_pp",
+        "authors": ["santiago_abascal"],
+        "implausible_under": ["alberto_nunez_feijoo"],
+        "why": "Attacks the PP, Feijoo's party, in terms that survive anonymization.",
+        "patterns": ["populares y socialistas", "socialistas y populares", "ppsoe", "bipartidismo", "derechita"]
+      }
+    ]
+  }
+}
