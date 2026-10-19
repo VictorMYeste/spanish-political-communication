@@ -10,7 +10,7 @@ python src/prepare_x_stimuli.py   # cleans and anonymizes text_anon, writes x_st
 
 | Output | Content |
 | --- | --- |
-| `data/processed/x_stimuli.csv` | `text_anon` holds the cleaned and anonymized text. `keep_for_prompt` stays `False`; it is set when the sample is drawn |
+| `data/processed/x_stimuli.csv` | `text_anon` holds the cleaned and anonymized text. `keep_for_prompt` stays `False`; it is set by `src/sample_x_stimuli.py` |
 | `data/processed/x_stimuli_qa.csv` | One row per stimulus: `exclude_reason`, `role_groups`, `role_terms`, `implausible_under` |
 
 ## Quality filters
@@ -96,27 +96,29 @@ The markers are a lower bound. The government–opposition position is part of m
 
 Filtering on the markers is not an option. It would leave 7 Abascal posts on household costs (below the minimum of 10), 26 and 23 Feijóo and Abascal posts on corruption, and it would still keep many implausible posts. The options are:
 
-1. **Plausibility check (preferred by Víctor, pending Candida's confirmation).** For each sampled post and each leader, ask the model whether that leader could plausibly have written it. That is three short calls per sampled post. It works as a manipulation check: the main analysis keeps all posts, and a robustness analysis keeps only the plausible post–leader pairs. The marker flags stay as a transparent lower bound.
+1. **Plausibility check (preferred by Víctor, pending Candida's confirmation).** For each selected post and each leader, ask the model whether that leader could plausibly have written it. That is three short calls per post. It works as a manipulation check: the main analysis keeps all posts, and a robustness analysis keeps only the plausible post–leader pairs. The marker flags stay as a transparent lower bound.
 2. **Only plausible attributions.** Show each post only under the leaders who could have written it. The design is then no longer fully crossed: posts by Sánchez that speak for the Government would only be shown anonymously and under his name.
 3. **Flags as a covariate.** Keep the fully crossed design and use the marker flag in the models. Cheapest, but the flag misses many posts.
 
 The leakage probe of PROPOSAL.md (asking the model who wrote the anonymous version) measures something different: it also identifies authors through ideology ("deportaciones ya" points to Abascal), which is part of the message, not an implausible attribution.
 
-## Sample
+## Selection
 
-`src/sample_x_stimuli.py` draws the same number of posts for each topic and real author from the posts that pass every check, or all of them where a cell has fewer (seed 20261019). As in the previous paper, `other` and `review_needed` are left out by default; `--other-per-author` adds posts without a topic. There is no moral-relevance filter (step 4): ME2-BERT does not support Spanish.
+The stimuli are all the posts on the four topics that pass every check: 1,075 posts, with no sampling. The previous paper did the same: its prompt pool kept every post on its topics and left out posts without a topic or with several. `other` and `review_needed` are left out here too. There is no moral-relevance filter (step 4): ME2-BERT does not support Spanish.
+
+| Topic | Feijóo | Sánchez | Abascal | Total |
+| --- | ---: | ---: | ---: | ---: |
+| corruption | 127 | 27 | 114 | 268 |
+| economy_employment | 99 | 304 | 30 | 433 |
+| household_costs | 94 | 123 | 11 | 228 |
+| immigration_border | 40 | 50 | 56 | 146 |
+| Total | 360 | 504 | 211 | 1,075 |
+
+That is 3,225 calls for the plausibility check (posts × 3 leaders) and 4,300 persona judgments per persona (posts × 4 conditions).
 
 ```bash
-python src/sample_x_stimuli.py --per-cell 20 --personas 100 --dry-run   # counts and model calls, writes nothing
-python src/sample_x_stimuli.py --per-cell 20                             # sets keep_for_prompt, writes the manifest
+python src/sample_x_stimuli.py --personas 100 --dry-run   # counts and model calls, writes nothing
+python src/sample_x_stimuli.py                            # sets keep_for_prompt, writes the manifest
 ```
 
-The sampled posts get `keep_for_prompt = True`. `data/processed/x_sample_manifest.json` records the parameters, the eligible and sampled counts and the sampled message IDs, so the sample can be published without the text.
-
-| Posts per cell | Posts | Plausibility check | Persona judgments per 100 personas |
-| ---: | ---: | ---: | ---: |
-| 10 | 120 | 360 | 48,000 |
-| 20 | 231 | 693 | 92,400 |
-| 27 | 308 | 924 | 123,200 |
-
-Abascal has 11 posts on household costs, so that cell is complete from 11 on. 27 is the largest size that fills every other cell (Sánchez has 27 posts on corruption). The size is not fixed yet: it depends on the number of personas and the time available on the GPU **[open, Candida]**.
+The selected posts get `keep_for_prompt = True`. `data/processed/x_sample_manifest.json` records the parameters, the counts and the selected message IDs, so the stimulus set can be published without the text. If the GPU time does not allow every post, `--per-cell` draws at most that many posts per topic and real author (seed 20261019), and `--other-per-author` adds posts without a topic.

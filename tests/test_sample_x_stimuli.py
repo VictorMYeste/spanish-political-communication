@@ -57,6 +57,8 @@ def test_draw_caps_cells_and_skips_other_by_default():
     assert drawn == sample.draw(rows, per_cell=3, other_per_author=0, seed=1)[0]
     with_other, _ = sample.draw(rows, per_cell=3, other_per_author=2, seed=1)
     assert len(with_other[("other", "a")]) == 2
+    everything, _ = sample.draw(rows, per_cell=None, other_per_author=0, seed=1)
+    assert {cell: len(ids) for cell, ids in everything.items()} == {("corruption", "a"): 5, ("corruption", "b"): 2}
 
 
 def test_model_calls():

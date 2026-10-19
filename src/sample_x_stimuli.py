@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
-"""Draw the stimulus sample: the same number of posts per topic and real author.
+"""Select the stimuli: the posts on the RQ3 topics that pass every check.
 
 Takes the posts that pass every check of prepare_x_stimuli.py and have one of
-the RQ3 topics, and draws up to --per-cell posts for each topic and real
-author, or all of them where a cell has fewer. --other-per-author adds posts
-without a topic.
+the RQ3 topics, all of them by default. --per-cell draws at most that many
+posts for each topic and real author instead, and --other-per-author adds
+posts without a topic.
 
-Sets keep_for_prompt to True for the sampled posts and False for the rest, and
-writes a manifest with the parameters, the counts and the sampled message IDs.
+Sets keep_for_prompt to True for the selected posts and False for the rest, and
+writes a manifest with the parameters, the counts and the selected message IDs.
 --dry-run prints the counts and the number of model calls without writing.
 """
 
@@ -50,9 +50,12 @@ def eligible(stimuli: List[Dict[str, str]], qa: List[Dict[str, str]]) -> List[Di
 
 
 def draw(
-    rows: List[Dict[str, str]], per_cell: int, other_per_author: int, seed: int
+    rows: List[Dict[str, str]], per_cell: Optional[int], other_per_author: int, seed: int
 ) -> Tuple[Dict[Cell, List[str]], Counter]:
-    """Return the sampled message IDs and the eligible counts per (topic, actor) cell."""
+    """Return the selected message IDs and the eligible counts per (topic, actor) cell.
+
+    per_cell None keeps every eligible post on a topic.
+    """
     cells: Dict[Cell, List[str]] = {}
     for row in rows:
         topic = row["topic"]
@@ -63,7 +66,7 @@ def draw(
     sample = {}
     for cell in sorted(cells):
         ids = sorted(cells[cell])
-        size = other_per_author if cell[0] == "other" else per_cell
+        size = other_per_author if cell[0] == "other" else per_cell or len(ids)
         sample[cell] = sorted(rng.sample(ids, min(size, len(ids))))
     return sample, Counter({cell: len(ids) for cell, ids in cells.items()})
 
@@ -78,7 +81,7 @@ def model_calls(posts: int, personas: Optional[int]) -> Dict[str, Optional[int]]
 def summary(sample: Dict[Cell, List[str]], available: Counter, calls: Dict[str, Optional[int]]) -> str:
     topics = sorted({topic for topic, _ in available}, key=lambda t: (t == "other", t))
     actors = sorted({actor for _, actor in available})
-    lines = ["Sampled / eligible:", "", "| Topic | " + " | ".join(actors) + " |", "| --- |" + " ---: |" * len(actors)]
+    lines = ["Selected / eligible:", "", "| Topic | " + " | ".join(actors) + " |", "| --- |" + " ---: |" * len(actors)]
     for topic in topics:
         lines.append(
             f"| {topic} | "
@@ -99,7 +102,7 @@ def summary(sample: Dict[Cell, List[str]], available: Counter, calls: Dict[str, 
 
 def main(argv: Optional[List[str]] = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    parser.add_argument("--per-cell", type=int, required=True, help="posts per topic and real author")
+    parser.add_argument("--per-cell", type=int, help="at most this many posts per topic and real author (default: all)")
     parser.add_argument("--other-per-author", type=int, default=0, help="posts without a topic per author (default 0)")
     parser.add_argument("--personas", type=int, help="number of personas, only to count model calls")
     parser.add_argument("--seed", type=int, default=DEFAULT_SEED)
@@ -108,7 +111,7 @@ def main(argv: Optional[List[str]] = None) -> int:
     parser.add_argument("--manifest", type=Path, default=DEFAULT_MANIFEST)
     parser.add_argument("--dry-run", action="store_true", help="print the counts without writing")
     args = parser.parse_args(argv)
-    if args.per_cell < 1 or args.other_per_author < 0:
+    if (args.per_cell is not None and args.per_cell < 1) or args.other_per_author < 0:
         parser.error("--per-cell must be at least 1 and --other-per-author at least 0")
 
     stimuli = read_csv(args.stimuli)
