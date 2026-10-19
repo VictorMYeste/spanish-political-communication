@@ -104,7 +104,7 @@ The leakage probe of PROPOSAL.md (asking the model who wrote the anonymous versi
 
 ## Sample
 
-`src/sample_x_stimuli.py` draws the same number of posts for each topic and real author from the posts that pass every check, or all of them where a cell has fewer (seed 20261019). As in the previous paper, `other` and `review_needed` are left out by default; `--other-per-author` adds posts without a topic. `--morally-relevant-only` keeps only morally relevant posts, once the moral-relevance filter (step 4) has filled `is_morally_relevant`.
+`src/sample_x_stimuli.py` draws the same number of posts for each topic and real author from the posts that pass every check, or all of them where a cell has fewer (seed 20261019). As in the previous paper, `other` and `review_needed` are left out by default; `--other-per-author` adds posts without a topic. There is no moral-relevance filter (step 4): ME2-BERT does not support Spanish.
 
 ```bash
 python src/sample_x_stimuli.py --per-cell 20 --personas 100 --dry-run   # counts and model calls, writes nothing

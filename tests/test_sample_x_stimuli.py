@@ -33,23 +33,23 @@ def tables():
     ]:
         for i in range(n):
             message_id = f"{actor}_{topic}_{i}"
-            stimuli.append({"message_id": message_id, "topic": topic, "text_anon": "t", "keep_for_prompt": "False", "is_morally_relevant": ""})
+            stimuli.append({"message_id": message_id, "topic": topic, "text_anon": "t", "keep_for_prompt": "False"})
             qa.append({"message_id": message_id, "actor_id": actor, "exclude_reason": "too_short" if i < excluded else ""})
     return stimuli, qa
 
 
 def test_eligible_drops_excluded_posts():
     stimuli, qa = tables()
-    rows = sample.eligible(stimuli, qa, morally_relevant_only=False)
+    rows = sample.eligible(stimuli, qa)
     assert len(rows) == len(stimuli) - 1
     assert "a_corruption_0" not in {row["message_id"] for row in rows}
     with pytest.raises(ValueError):
-        sample.eligible(stimuli, qa, morally_relevant_only=True)
+        sample.eligible(stimuli + [{"message_id": "z", "topic": "other"}], qa)
 
 
 def test_draw_caps_cells_and_skips_other_by_default():
     stimuli, qa = tables()
-    rows = sample.eligible(stimuli, qa, morally_relevant_only=False)
+    rows = sample.eligible(stimuli, qa)
     drawn, available = sample.draw(rows, per_cell=3, other_per_author=0, seed=1)
 
     assert {cell: len(ids) for cell, ids in drawn.items()} == {("corruption", "a"): 3, ("corruption", "b"): 2}
