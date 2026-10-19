@@ -198,11 +198,14 @@ Within `household_costs`, 130 posts match housing only, 92 prices only and 7 bot
 | `data/processed/x_topics.csv` | One row per post: topic, candidate topics, matched groups and matched terms |
 | `data/processed/x_topic_coverage.csv` | The coverage table above |
 | `data/processed/x_topic_spotcheck.csv` | 20 random original posts per topic (seed 20261018), with the manual judgments `is_correct`, `is_main_topic` and `note` |
+| `data/processed/x_stimuli.csv` | Its `topic` column is filled: one of the four kept topics, `review_needed`, or `other`. Health posts become `other`; posts matching health and a kept topic stay `review_needed`, as in the coverage table |
 
 ```bash
 python src/assign_x_topics.py                        # keeps an existing spot-check file
 python src/assign_x_topics.py --overwrite-spotcheck  # draws a new sample, losing the annotations
 ```
+
+`x_stimuli.csv` holds original posts only (7,625). `src/build_x_tables.py` writes it with an empty `topic` column, so run `assign_x_topics.py` again after rebuilding the tables.
 
 ### Spot check
 

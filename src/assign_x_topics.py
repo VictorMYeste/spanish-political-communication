@@ -8,7 +8,8 @@ per topic and leader and compares them with the minimum fixed in
 config/cis_topic_selection.json (step 5 of docs/TOPIC_SELECTION.md).
 
 Also writes a random sample of matched original posts per topic for a manual
-spot check.
+spot check, and fills the topic column of the stimuli table: topics that pass
+the coverage check are kept, the others become other.
 """
 
 from __future__ import annotations
@@ -31,6 +32,7 @@ DEFAULT_IN = ROOT / "data" / "processed" / "x_posts_internal.csv"
 DEFAULT_OUT = ROOT / "data" / "processed" / "x_topics.csv"
 DEFAULT_COVERAGE = ROOT / "data" / "processed" / "x_topic_coverage.csv"
 DEFAULT_SPOTCHECK = ROOT / "data" / "processed" / "x_topic_spotcheck.csv"
+DEFAULT_STIMULI = ROOT / "data" / "processed" / "x_stimuli.csv"
 DEFAULT_SEED = 20261018
 
 URL_RE = re.compile(r"https?://\S+")
@@ -182,6 +184,21 @@ def spotcheck_sample(
     return sample
 
 
+def stimulus_topics(
+    stimuli: List[Dict[str, str]], labelled: List[Dict[str, str]], kept: List[str]
+) -> List[Dict[str, str]]:
+    """Copy each post's topic into the stimuli rows; topics that failed coverage become other."""
+    topics = {row["message_id"]: row["topic"] for row in labelled}
+    missing = [row["message_id"] for row in stimuli if row["message_id"] not in topics]
+    if missing:
+        raise ValueError(f"{len(missing)} stimuli have no topic label, for example {missing[0]}")
+    rows = []
+    for row in stimuli:
+        topic = topics[row["message_id"]]
+        rows.append({**row, "topic": topic if topic in kept or topic == "review_needed" else "other"})
+    return rows
+
+
 def write_spotcheck(path: Path, rows: List[Dict[str, str]], overwrite: bool) -> bool:
     """Write the spot-check sample unless an existing, possibly annotated, file would be lost."""
     if path.exists() and not overwrite:
@@ -193,6 +210,11 @@ def write_spotcheck(path: Path, rows: List[Dict[str, str]], overwrite: bool) -> 
 def read_csv(path: Path) -> List[Dict[str, str]]:
     with path.open(encoding="utf-8", newline="") as handle:
         return list(csv.DictReader(handle))
+
+
+def read_header(path: Path) -> List[str]:
+    with path.open(encoding="utf-8", newline="") as handle:
+        return next(csv.reader(handle))
 
 
 def write_csv(path: Path, rows: List[Dict[str, object]], fields: List[str]) -> None:
@@ -222,6 +244,7 @@ def main(argv: Optional[List[str]] = None) -> int:
     parser.add_argument("--out", type=Path, default=DEFAULT_OUT)
     parser.add_argument("--coverage", type=Path, default=DEFAULT_COVERAGE)
     parser.add_argument("--spotcheck", type=Path, default=DEFAULT_SPOTCHECK)
+    parser.add_argument("--stimuli", type=Path, default=DEFAULT_STIMULI, help="stimuli table whose topic column is filled")
     parser.add_argument("--spotcheck-size", type=int, default=20, help="posts per topic")
     parser.add_argument("--seed", type=int, default=DEFAULT_SEED)
     parser.add_argument(
@@ -239,15 +262,20 @@ def main(argv: Optional[List[str]] = None) -> int:
     labelled = label_posts(posts, registry)
     coverage_rows = coverage(labelled, registry.names, actors, minimum)
     sample = spotcheck_sample(labelled, posts, registry.names, args.spotcheck_size, args.seed)
+    kept = [str(row["topic"]) for row in coverage_rows if row.get("kept")]
+    stimuli = stimulus_topics(read_csv(args.stimuli), labelled, kept)
 
     write_csv(args.out, labelled, OUT_FIELDS)
     write_csv(args.coverage, coverage_rows, ["topic"] + actors + ["total", "min_per_leader", "kept"])
+    write_csv(args.stimuli, stimuli, read_header(args.stimuli))
     wrote_sample = write_spotcheck(args.spotcheck, sample, args.overwrite_spotcheck)
 
     originals = sum(1 for post in posts if post["post_type"] == "original")
     print(f"{len(posts)} posts, {originals} original. Coverage on original posts:\n")
     print(markdown_table(coverage_rows, actors, minimum))
     print(f"\nWrote {args.out} and {args.coverage}")
+    dropped = [topic for topic in registry.names if topic not in kept]
+    print(f"Filled the topic column of {args.stimuli}" + (f"; {', '.join(dropped)} written as other" if dropped else ""))
     if wrote_sample:
         print(f"Wrote {len(sample)} spot-check rows to {args.spotcheck}")
     else:

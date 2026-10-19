@@ -71,7 +71,7 @@ Output file: `data/processed/x_posts_internal.csv`, written by `src/build_x_tabl
 
 Same columns for every source, compatible with the prompt-ready table of the previous paper. Pseudonymised, not anonymous: exact text remains searchable.
 
-Output files: `data/processed/congreso_stimuli.csv`, `data/processed/x_stimuli.csv`.
+Output files: `data/processed/congreso_stimuli.csv`, `data/processed/x_stimuli.csv`. The X table holds original posts only; quotes and replies stay in the internal table (`docs/PROPOSAL.md`, section 6).
 
 | Column | Description |
 | --- | --- |

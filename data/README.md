@@ -24,7 +24,7 @@ raw/        responses exactly as the sources returned them
   cis/      es<study>mar.pdf, results PDF of each CIS barometer
 processed/  tables built from the raw data
   x_posts_internal.csv   full text and provenance, one row per post
-  x_stimuli.csv          pseudonymised table for the persona experiments
+  x_stimuli.csv          pseudonymised table for the persona experiments, original posts only; topic filled by src/assign_x_topics.py
   x_build_summary.json   counts, date range and quality checks of the build
   cis_problems_monthly.csv      CIS main problems of Spain, one row per barometer and category
   cis_topic_ranking.csv         topic ranking for RQ3 (docs/TOPIC_SELECTION.md)

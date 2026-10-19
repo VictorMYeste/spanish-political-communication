@@ -123,6 +123,22 @@ def test_project_registry_examples(project, text, expected):
     assert assign.assign(project.match(text)) == expected
 
 
+def test_stimulus_topics_keeps_only_topics_that_passed_coverage():
+    labelled = [
+        {"message_id": "1", "topic": "household_costs"},
+        {"message_id": "2", "topic": "health"},
+        {"message_id": "3", "topic": "review_needed"},
+        {"message_id": "4", "topic": "other"},
+    ]
+    stimuli = [{"message_id": m, "text_anon": "x", "topic": ""} for m in ["1", "2", "3", "4"]]
+    rows = assign.stimulus_topics(stimuli, labelled, ["household_costs"])
+
+    assert [row["topic"] for row in rows] == ["household_costs", "other", "review_needed", "other"]
+    assert rows[0]["text_anon"] == "x"
+    with pytest.raises(ValueError):
+        assign.stimulus_topics([{"message_id": "5", "topic": ""}], labelled, ["household_costs"])
+
+
 def test_write_spotcheck_keeps_an_existing_file(tmp_path):
     path = tmp_path / "spotcheck.csv"
     path.write_text("annotated\n", encoding="utf-8")

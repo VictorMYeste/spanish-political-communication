@@ -7,8 +7,9 @@ internal table with provenance, and a stimuli table whose columns are shared
 with the Congreso pipeline.
 
 The text of referenced posts (the quoted or replied-to post) is kept in the
-internal table so that short posts can be interpreted in context. Whether that
-context reaches the prompts is decided later, during preprocessing.
+internal table so that short posts can be interpreted in context. The stimuli
+table holds original posts only: quotes and replies depend on another author's
+text, so they stay in the internal table (docs/PROPOSAL.md, section 6).
 """
 
 from __future__ import annotations
@@ -270,7 +271,7 @@ def build_rows(
 
 
 def stimulus_rows(rows: Iterable[Mapping[str, object]]) -> List[Dict[str, object]]:
-    """Derive the stimuli table from the internal rows."""
+    """Derive the stimuli table from the internal rows, original posts only."""
     return [
         {
             "tweet_id": row["post_id"],
@@ -288,6 +289,7 @@ def stimulus_rows(rows: Iterable[Mapping[str, object]]) -> List[Dict[str, object
             "isDeleted": "False",
         }
         for row in rows
+        if row["post_type"] == "original"
     ]
 
 
@@ -327,7 +329,8 @@ def main() -> int:
     stimuli_path = args.output_dir / "x_stimuli.csv"
     summary_path = args.output_dir / "x_build_summary.json"
     write_csv(internal_path, INTERNAL_FIELDS, rows)
-    write_csv(stimuli_path, STIMULUS_FIELDS, stimulus_rows(rows))
+    stimuli = stimulus_rows(rows)
+    write_csv(stimuli_path, STIMULUS_FIELDS, stimuli)
     summary_path.write_text(json.dumps(summary, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
     print(f"{summary['posts']} posts, {summary['duplicates_skipped']} duplicates skipped")
@@ -336,6 +339,7 @@ def main() -> int:
     print(f"  by type: {summary['posts_by_type']}")
     print(f"  references without stored text: {summary['references_without_text']}")
     print(f"  dates: {summary['first_date']} to {summary['last_date']}")
+    print(f"  stimuli (original posts): {len(stimuli)}")
     print(f"Written: {internal_path}, {stimuli_path}, {summary_path}")
     return 0
 
