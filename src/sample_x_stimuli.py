@@ -4,8 +4,7 @@
 Takes the posts that pass every check of prepare_x_stimuli.py and have one of
 the RQ3 topics, and draws up to --per-cell posts for each topic and real
 author, or all of them where a cell has fewer. --other-per-author adds posts
-without a topic, and --morally-relevant-only keeps only the posts marked
-morally relevant, once that filter has been run.
+without a topic.
 
 Sets keep_for_prompt to True for the sampled posts and False for the rest, and
 writes a manifest with the parameters, the counts and the sampled message IDs.
@@ -37,25 +36,17 @@ LEADERS = 3
 Cell = Tuple[str, str]
 
 
-def eligible(
-    stimuli: List[Dict[str, str]], qa: List[Dict[str, str]], morally_relevant_only: bool
-) -> List[Dict[str, str]]:
+def eligible(stimuli: List[Dict[str, str]], qa: List[Dict[str, str]]) -> List[Dict[str, str]]:
     """Posts that pass every check, with their real author and topic."""
     checks = {row["message_id"]: row for row in qa}
     missing = [row["message_id"] for row in stimuli if row["message_id"] not in checks]
     if missing:
         raise ValueError(f"{len(missing)} stimuli are not in the QA table, for example {missing[0]}")
-    if morally_relevant_only and any(not row["is_morally_relevant"] for row in stimuli):
-        raise ValueError("is_morally_relevant is empty; run the moral-relevance filter first")
-    rows = []
-    for row in stimuli:
-        check = checks[row["message_id"]]
-        if check["exclude_reason"]:
-            continue
-        if morally_relevant_only and row["is_morally_relevant"].lower() not in {"true", "1"}:
-            continue
-        rows.append({"message_id": row["message_id"], "actor_id": check["actor_id"], "topic": row["topic"]})
-    return rows
+    return [
+        {"message_id": row["message_id"], "actor_id": checks[row["message_id"]]["actor_id"], "topic": row["topic"]}
+        for row in stimuli
+        if not checks[row["message_id"]]["exclude_reason"]
+    ]
 
 
 def draw(
@@ -110,7 +101,6 @@ def main(argv: Optional[List[str]] = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--per-cell", type=int, required=True, help="posts per topic and real author")
     parser.add_argument("--other-per-author", type=int, default=0, help="posts without a topic per author (default 0)")
-    parser.add_argument("--morally-relevant-only", action="store_true")
     parser.add_argument("--personas", type=int, help="number of personas, only to count model calls")
     parser.add_argument("--seed", type=int, default=DEFAULT_SEED)
     parser.add_argument("--stimuli", type=Path, default=DEFAULT_STIMULI)
@@ -122,7 +112,7 @@ def main(argv: Optional[List[str]] = None) -> int:
         parser.error("--per-cell must be at least 1 and --other-per-author at least 0")
 
     stimuli = read_csv(args.stimuli)
-    rows = eligible(stimuli, read_csv(args.qa), args.morally_relevant_only)
+    rows = eligible(stimuli, read_csv(args.qa))
     sample, available = draw(rows, args.per_cell, args.other_per_author, args.seed)
     sampled = {message_id for ids in sample.values() for message_id in ids}
     calls = model_calls(len(sampled), args.personas)
@@ -136,7 +126,6 @@ def main(argv: Optional[List[str]] = None) -> int:
         "seed": args.seed,
         "per_cell": args.per_cell,
         "other_per_author": args.other_per_author,
-        "morally_relevant_only": args.morally_relevant_only,
         "posts": len(sampled),
         "cells": [
             {"topic": topic, "actor_id": actor, "eligible": available[(topic, actor)], "message_ids": ids}

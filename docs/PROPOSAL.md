@@ -88,7 +88,7 @@ Other leaders (Sumar once it has a leader, Podemos, ERC, Junts, EH Bildu, PNV) c
 1. **Collection.** Raw API responses stored untouched, with query manifests (`docs/X_SCRIPTS.md`).
 2. **Normalisation.** Shared internal and stimuli tables per source (`docs/DATA_DICTIONARY.md`).
 3. **Quality filters.** Remove retweets (already excluded at query time), decode HTML entities, remove URLs, normalise whitespace, drop very short or low-information posts. Only original posts are used: quotes and replies depend on another author's text, which would either be missing from the stimulus or add a second, often identifiable, author. They stay in the internal table for context but do not become stimuli. Thresholds of the previous paper (40 characters, 7 words), and duplicates removed ([STIMULI.md](STIMULI.md)).
-4. **Moral relevance.** ME2-BERT, if it supports Spanish. **[open]** Otherwise a multilingual alternative or translation, validated on a manually annotated sample.
+4. **Moral relevance.** Not used. ME2-BERT, the filter of the previous paper, does not support Spanish, and a multilingual alternative or a translation would need its own validation. Posts are selected by topic instead (§7), and the moral-relevance columns of the stimuli table stay empty.
 5. **Topic assignment.** Spanish high-precision keyword registry (`config/x_topic_keywords.json`), exactly-one-match rule, `review_needed` for multi-topic hits, as in the previous paper. Results and spot check in [TOPIC_SELECTION.md](TOPIC_SELECTION.md).
 6. **Anonymization.** Replace actor names and nicknames, party names and acronyms, campaign slogans and hashtags, and user handles with placeholders (`[POLITICAL_ACTOR]`, `[PARTY]`, `[CAMPAIGN_TAG]`, `[USER]`). Check for identity leaks, degradation and context dependence. The anonymized text is shown in all four conditions. Only the three leaders and their parties are replaced; other politicians' names stay. 7,299 of 7,625 original posts pass the quality and anonymization checks ([STIMULI.md](STIMULI.md)).
 7. **Attribution conditions.** The no-author condition shows the anonymized post with a neutral role. Each attributed condition shows the same text with one leader named as its author. **[open]** How the speaker is named (name only, or name and party), and whether institutional roles such as "President of the Government" are shown, since they identify Sánchez.
@@ -180,7 +180,7 @@ Decided at the meeting of 2026-10-07:
 * Personas are grouped by elicited ideological self-placement, which is never shown to them when they judge messages.
 * CIS is used to compare the ordering of leader preferences by ideological group, not topic-level distributions.
 
-Decided earlier: collection window from April 2022 (collected); preprint in mid-November 2026 and ARR submission targeting ACL 2027; original posts only, without replies and quotes (§6); final topic set (§7).
+Decided earlier: collection window from April 2022 (collected); preprint in mid-November 2026 and ARR submission targeting ACL 2027; original posts only, without replies and quotes (§6); no moral-relevance filter, because ME2-BERT does not support Spanish (§6); final topic set (§7).
 
 Still open:
 
