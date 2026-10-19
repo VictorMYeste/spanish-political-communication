@@ -85,6 +85,9 @@ python src/check_x_access.py --write-ids   # check access, resolve account IDs
 python src/collect_x.py --counts-only      # how many posts and what they would cost
 python src/collect_x.py                    # counts, confirms, then downloads
 python src/build_x_tables.py               # internal and stimuli tables
+python src/assign_x_topics.py              # RQ3 topics (docs/TOPIC_SELECTION.md)
+python src/prepare_x_stimuli.py            # quality filters, anonymization, role markers (docs/STIMULI.md)
+python src/sample_x_stimuli.py --per-cell 20 --dry-run   # stimulus sample (docs/STIMULI.md)
 ```
 
 Costs, options and data handling are described in [docs/X_SCRIPTS.md](docs/X_SCRIPTS.md).
