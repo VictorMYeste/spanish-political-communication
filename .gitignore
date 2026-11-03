@@ -6,3 +6,6 @@ data/*
 !data/README.md
 *.part
 .env
+
+# Candida test files shared with Victor, not to be committed
+candida_spanish_reactions/
