@@ -92,6 +92,14 @@ python src/sample_x_stimuli.py            # stimulus selection, keep_for_prompt 
 
 Costs, options and data handling are described in [docs/X_SCRIPTS.md](docs/X_SCRIPTS.md).
 
+## Persona ideology
+
+Each persona of the reaction runs answers the CIS left–right self-placement question, used to form the ideological groups of RQ2 and RQ4. The wording, choices and outputs are in [docs/PERSONA_IDEOLOGY.md](docs/PERSONA_IDEOLOGY.md).
+
+```bash
+python src/elicit_persona_ideology.py --framework iw --reactions-dir data/spanish_reactions --dry-run
+```
+
 ## Sources for the follow-up paper
 
 The Congreso, La Moncloa and PP pipelines stay in the repository for the follow-up paper. Their commands, outputs and quality checks are in [docs/CONGRESO_SCRIPTS.md](docs/CONGRESO_SCRIPTS.md), [docs/MONCLOA_SCRIPTS.md](docs/MONCLOA_SCRIPTS.md) and [docs/PP_MEDIA_SCRIPTS.md](docs/PP_MEDIA_SCRIPTS.md).
