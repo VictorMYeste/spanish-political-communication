@@ -115,8 +115,8 @@ The meeting had proposed immigration, housing and the economy and cost of living
 * **Pool.** The persona pool of Greco et al. (2026), not restricted by country. In Candida's preliminary analysis, the country label carried no cultural effect (gpt-oss assigns it almost at random, mostly the United States), and the pool is not intended to represent any real population.
 * **Elicited ideological self-placement.** The pool has no left–right variable. Before showing any post, every persona answers the CIS 1–10 left–right self-placement question. It is the model's interpretation of the persona, not ground truth. It is used only to form left, centre and right groups, and the persona's group is never included in the prompts in which it judges messages.
 * **[open, Candida]** Which personas from the pool are used: the whole pool, a sample, or the IW/MFT selection strategies of the previous paper.
-* **[open]** Frame of reference. The left–right scale is relative to each country's party system, so decide whether personas answer it, and judge the posts, as residents of Spain.
-* **[open]** Stability. Repeated or paraphrased elicitation, and whether personas with unstable answers are dropped.
+* **Frame of reference** (decided 2026-11-06). The left–right scale is relative to each country's party system, so the question anchors it to Spanish politics; the personas are not made residents of Spain, as in the reaction prompts. Wording and script: [PERSONA_IDEOLOGY.md](PERSONA_IDEOLOGY.md).
+* **Stability** (deferred to December 2026). One elicitation in the preprint; reworded questions and a check without the Spanish anchor are possible extras ([PERSONA_IDEOLOGY.md](PERSONA_IDEOLOGY.md)).
 * **[open]** Additional CIS items to make the placement more robust: vote recall and party sympathy, and the placement of PSOE, PP and VOX on the same scale as a check that the persona understands the Spanish scale. Leader ratings are not used for grouping, because they are the outcome compared in RQ4.
 * **[open]** Cut-offs for the left, centre and right groups. They must be the same as those used for CIS respondents in RQ4.
 
@@ -188,6 +188,6 @@ Still open:
 2. How the speaker is named in the attributed conditions, and which author role each condition shows (§6).
 3. Cross-attribution plausibility filter and leakage probe (§6).
 4. Unit of judgment: single post or also bundles (§6).
-5. Persona sampling, frame of reference, elicitation stability, additional CIS items and group cut-offs (§8).
+5. Persona sampling, additional CIS items and group cut-offs (§8).
 6. CIS waves (§9).
 7. Prompt language, and the second model if RQ6 is run (§10).
