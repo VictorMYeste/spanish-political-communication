@@ -26,7 +26,7 @@ Choices:
 * **No "don't know" option.** The CIS item offers only 1–10; "N.S." and "N.C." are recorded when given (3.4% in October 2026). A persona whose answer is not an integer from 1 to 10 after the retries is left out of the groups.
 * **Same settings as the reactions:** gpt-oss-20b, temperature 0, seed 42, JSON mode, 4,096 tokens.
 
-The cut-offs for the three groups are decided with the RQ4 analysis and applied to CIS respondents in the same way. Until then, the script prints the provisional split, 1–4 / 5–6 / 7–10, to check early that no group is too small (the personas cannot be extended without running the reactions again), and the RQ2 analysis ([RQ2_ANALYSIS.md](RQ2_ANALYSIS.md)) uses the same split.
+The groups are left 1–4, centre 5–6 and right 7–10 (`GROUPS` in the script). The RQ2 analysis ([RQ2_ANALYSIS.md](RQ2_ANALYSIS.md)) uses them for the personas, and the RQ4 analysis ([RQ4_ANALYSIS.md](RQ4_ANALYSIS.md)) applies them to CIS respondents. The script prints the split at the end, to check that no group is too small (the personas cannot be extended without running the reactions again).
 
 ## Running it
 

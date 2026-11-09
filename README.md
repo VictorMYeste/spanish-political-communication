@@ -108,6 +108,15 @@ The speaker-attribution effect by left, centre and right persona group, and the 
 python src/analyze_ideological_congruence.py
 ```
 
+## RQ4 analysis
+
+The order of the leaders' preferences by ideological group, personas against CIS respondents (leader ratings from the 48 barometers of the window). Method and outputs in [docs/RQ4_ANALYSIS.md](docs/RQ4_ANALYSIS.md).
+
+```bash
+python src/collect_cis_microdata.py
+python src/analyze_cis_comparison.py
+```
+
 ## Sources for the follow-up paper
 
 The Congreso, La Moncloa and PP pipelines stay in the repository for the follow-up paper. Their commands, outputs and quality checks are in [docs/CONGRESO_SCRIPTS.md](docs/CONGRESO_SCRIPTS.md), [docs/MONCLOA_SCRIPTS.md](docs/MONCLOA_SCRIPTS.md) and [docs/PP_MEDIA_SCRIPTS.md](docs/PP_MEDIA_SCRIPTS.md).

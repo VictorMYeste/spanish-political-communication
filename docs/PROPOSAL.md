@@ -118,7 +118,7 @@ The meeting had proposed immigration, housing and the economy and cost of living
 * **Frame of reference** (decided 2026-11-06). The left–right scale is relative to each country's party system, so the question anchors it to Spanish politics; the personas are not made residents of Spain, as in the reaction prompts. Wording and script: [PERSONA_IDEOLOGY.md](PERSONA_IDEOLOGY.md).
 * **Stability** (deferred to December 2026). One elicitation in the preprint; reworded questions and a check without the Spanish anchor are possible extras ([PERSONA_IDEOLOGY.md](PERSONA_IDEOLOGY.md)).
 * **[open]** Additional CIS items to make the placement more robust: vote recall and party sympathy, and the placement of PSOE, PP and VOX on the same scale as a check that the persona understands the Spanish scale. Leader ratings are not used for grouping, because they are the outcome compared in RQ4.
-* **[open]** Cut-offs for the left, centre and right groups. They must be the same as those used for CIS respondents in RQ4.
+* Cut-offs for the left, centre and right groups: 1–4, 5–6 and 7–10, the same for personas (RQ2) and CIS respondents (RQ4).
 
 ## 9. External benchmark: CIS
 
@@ -133,7 +133,7 @@ Items to inventory, with availability checked wave by wave:
 
 * Ratings of and confidence in the three leaders.
 * Ideological self-placement (1–10), to form the CIS groups with the same cut-offs as the personas.
-* **[open]** Waves: those covering the analysis window, or the most recent ones before the election.
+* Waves: the 48 barometers from April 2022 to October 2026, the window of the posts, pooled with every wave weighing the same. Method and script: [RQ4_ANALYSIS.md](RQ4_ANALYSIS.md).
 
 Selection follows the Pew protocol of the previous paper: deterministic inventory, inclusion and exclusion codes, weighted distributions, response-scale record, rule trace per item.
 
@@ -148,7 +148,7 @@ Selection follows the Pew protocol of the previous paper: deterministic inventor
 * **RQ1.** For each persona and post, compare stance and labels in each attributed condition with the no-author condition. Models with the condition as predictor and persona and post as random effects (e.g., ordinal mixed-effects models).
 * **RQ2.** The RQ1 models with the interaction between attributed leader and persona ideological group. Congruence: whether the shift is more positive when the attributed leader is ideologically closer to the persona. Method and script: [RQ2_ANALYSIS.md](RQ2_ANALYSIS.md).
 * **RQ3.** The interaction between attributed leader and topic, with effects estimated within each topic and compared across topics.
-* **RQ4.** Within each ideological group, rank the three leaders by their synthetic attribution effect and by their weighted mean CIS evaluation, and compare the rankings and the direction of the differences between leaders.
+* **RQ4.** Within each ideological group, rank the three leaders by their synthetic attribution effect and by their weighted mean CIS evaluation, and compare the rankings and the direction of the differences between leaders. Method and script: [RQ4_ANALYSIS.md](RQ4_ANALYSIS.md).
 * **RQ5.** Label posts by election period. Compare the topics and communication of each leader across periods, and add period × attributed leader to the RQ1 models.
 * **RQ6.** Re-run RQ1–RQ3 with a second model and compare the direction and size of the effects.
 

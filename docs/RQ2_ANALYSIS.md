@@ -20,7 +20,7 @@ The leaders are ordered left to right as the persona model places them in RQ0: S
 * **Within a group:** effect of A minus effect of B. Positive means the group penalises A less than B.
 * **Left minus right:** (A minus B among left personas) minus (A minus B among right personas). This is the congruence test. It is positive under congruence for stance, agreement, legitimacy and endorsement, and negative for offensiveness, where higher means more offensive.
 
-Every estimate is given for both frameworks together and for IW and MFT separately, over all topics and for each topic (RQ3 × RQ2). The effect by placement 1–10, over all topics, is there for a figure.
+Every estimate is given for both frameworks together and for IW and MFT separately, over all topics and for each topic (RQ3 × RQ2). The effect by placement 1–10, over all topics, is for the figure drawn by `python src/plot_by_placement.py`, next to the CIS ratings by placement of RQ4 (`--no-cis` draws the persona panel alone).
 
 ## Running it
 
