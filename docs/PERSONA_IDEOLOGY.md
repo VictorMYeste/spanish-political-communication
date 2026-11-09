@@ -47,8 +47,6 @@ python src/elicit_persona_ideology.py --framework mft --reactions-dir data/spani
 
 Join to the reactions on `framework` and `persona_id`.
 
-**Open, for Candida.** With the copies of `persona_selection_k50/iw_selected_topk.csv` and the reaction script on Víctor's machine, 8 of the 441 IW persona texts differ from those in the reactions: 23332, 43611, 54443, 57028, 62629, 79045, 83066 and 91589. All 350 MFT texts match. Running on the cluster, with the files that produced the reactions, should show whether the copies differ or the reactions used another text for those 8. If they still differ there, ask them with `--allow-mismatch` and leave them out of RQ2 (1.8% of the IW personas).
-
 ## Possible extras for December
 
 Not in the preprint. Each one reuses the script.
