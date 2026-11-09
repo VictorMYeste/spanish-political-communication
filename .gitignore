@@ -10,5 +10,8 @@ data/*
 # Candida test files shared with Victor, not to be committed
 candida_spanish_reactions/
 
+# Paper
+paper/
+
 # macOS Finder metadata
 .DS_Store
