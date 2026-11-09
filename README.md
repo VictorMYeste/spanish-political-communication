@@ -100,6 +100,14 @@ Each persona of the reaction runs answers the CIS left–right self-placement qu
 python src/elicit_persona_ideology.py --framework iw --reactions-dir data/spanish_reactions --dry-run
 ```
 
+## RQ2 analysis
+
+The speaker-attribution effect by left, centre and right persona group, and the congruence test. Method and outputs in [docs/RQ2_ANALYSIS.md](docs/RQ2_ANALYSIS.md).
+
+```bash
+python src/analyze_ideological_congruence.py
+```
+
 ## Sources for the follow-up paper
 
 The Congreso, La Moncloa and PP pipelines stay in the repository for the follow-up paper. Their commands, outputs and quality checks are in [docs/CONGRESO_SCRIPTS.md](docs/CONGRESO_SCRIPTS.md), [docs/MONCLOA_SCRIPTS.md](docs/MONCLOA_SCRIPTS.md) and [docs/PP_MEDIA_SCRIPTS.md](docs/PP_MEDIA_SCRIPTS.md).

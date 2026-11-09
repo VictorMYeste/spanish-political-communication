@@ -146,7 +146,7 @@ Selection follows the Pew protocol of the previous paper: deterministic inventor
 ## 11. Analyses
 
 * **RQ1.** For each persona and post, compare stance and labels in each attributed condition with the no-author condition. Models with the condition as predictor and persona and post as random effects (e.g., ordinal mixed-effects models).
-* **RQ2.** The RQ1 models with the interaction between attributed leader and persona ideological group. Congruence: whether the shift is more positive when the attributed leader is ideologically closer to the persona.
+* **RQ2.** The RQ1 models with the interaction between attributed leader and persona ideological group. Congruence: whether the shift is more positive when the attributed leader is ideologically closer to the persona. Method and script: [RQ2_ANALYSIS.md](RQ2_ANALYSIS.md).
 * **RQ3.** The interaction between attributed leader and topic, with effects estimated within each topic and compared across topics.
 * **RQ4.** Within each ideological group, rank the three leaders by their synthetic attribution effect and by their weighted mean CIS evaluation, and compare the rankings and the direction of the differences between leaders.
 * **RQ5.** Label posts by election period. Compare the topics and communication of each leader across periods, and add period × attributed leader to the RQ1 models.
