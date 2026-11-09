@@ -66,9 +66,9 @@ QUESTIONS = {
     ),
 }
 
-# Provisional cut-offs, used by the summary printed at the end and by the RQ2
-# analysis (analyze_ideological_congruence.py). The final ones must be the same
-# as those applied to CIS respondents in RQ4.
+# Cut-offs of the left, centre and right groups, used by the summary printed at
+# the end, by the RQ2 analysis (analyze_ideological_congruence.py) and, for CIS
+# respondents, by the RQ4 analysis (analyze_cis_comparison.py).
 GROUPS = {"left": range(1, 5), "centre": range(5, 7), "right": range(7, 11)}
 
 
