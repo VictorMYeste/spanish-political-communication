@@ -98,6 +98,7 @@ Each persona of the reaction runs answers the CIS left–right self-placement qu
 
 ```bash
 python src/elicit_persona_ideology.py --framework iw --reactions-dir data/spanish_reactions --dry-run
+python src/describe_persona_values.py    # how the IW and MFT selection profiles map onto the groups
 ```
 
 ## RQ2 analysis
