@@ -47,6 +47,26 @@ python src/elicit_persona_ideology.py --framework mft --reactions-dir data/spani
 
 Join to the reactions on `framework` and `persona_id`.
 
+## Values and self-placement
+
+The personas were selected by their IW or MFT profile for each topic (high, mid and low levels, 50 personas each), and no prompt mentions ideology. The left, centre and right groups therefore come from the values in the persona profiles. `src/describe_persona_values.py` shows how, with no model calls:
+
+```bash
+python src/describe_persona_values.py    # about 1 second
+```
+
+| Output, in `data/persona_values/<model>/` | Content |
+| --- | --- |
+| `profile_groups_<frame>.csv` | For each framework, topic and profile level: personas in each group, their shares, and the mean placement. A persona selected for several topics counts in each |
+| `value_correlations_<frame>.csv` | Spearman correlation between the placement and each value dimension in the framework's prompts (IW: the two coordinates; MFT: the six MFQ-2 foundations), one row per persona, with a 95% CI |
+| `summary_<frame>.json` | Persona counts, slots without a placement, and cells that hold exactly the same personas |
+
+Results for gpt-oss-20b, Spain frame:
+
+* **Topic profiles map onto left and right** wherever the profile has a political direction. For immigration, 82% (IW) and 88% (MFT) of the inclusive profile are left-leaning, and 64% and 100% of the restrictive profile right-leaning. For MFT, the redistribution and merit profiles of the economy, and the basic-needs and market profiles of household costs, are entirely left or entirely right. Corruption profiles do not separate by ideology in either framework.
+* **The placement follows the values shown to the model.** MFT: Care −0.87, Equality −0.67, Proportionality 0.67, Authority 0.59, Loyalty 0.43, Purity 0.21. IW: survival/self-expression −0.60, but traditional/secular-rational only −0.06.
+* **Some MFT cells are not independent.** The selection targets of economy-high and household-low are identical, as are those of economy-low and household-high, and all four mid levels share one target. Each of these sets holds the same 50 personas. The fully one-sided MFT cells partly show that the extremes of Care and Equality versus Proportionality are read as left versus right.
+
 ## Possible extras for December
 
 Not in the preprint. Each one reuses the script.
