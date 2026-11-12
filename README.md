@@ -16,7 +16,7 @@ The first paper asks whether the speaker's name changes how the same message is 
 
 Before seeing any post, each persona answers the 1–10 left–right self-placement question of the Centro de Investigaciones Sociológicas (CIS). This elicited ideological self-placement is the model's interpretation of the persona, not ground truth. It is used only to form left, centre and right groups and is never shown to the persona when it judges messages. The relative preferences for the three leaders in each group are then compared with those of the corresponding ideological groups in CIS surveys.
 
-The first paper uses X posts only. Parliamentary interventions and interviews are left for a follow-up paper. The general election is expected in early 2027.
+The first paper uses X posts only. Parliamentary interventions and interviews are left for a follow-up paper. The general election is scheduled for 29 November 2026.
 
 The full study design and open decisions are in [docs/PROPOSAL.md](docs/PROPOSAL.md).
 
