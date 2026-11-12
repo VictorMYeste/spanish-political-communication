@@ -19,7 +19,7 @@ The message stays the same; only the name changes. This tests whether the speake
 
 The effect is then broken down by the personas' elicited ideological self-placement (left, centre, right) and by topic, and compared with the relative evaluations of the three leaders by the corresponding ideological groups in surveys of the Spanish Centro de Investigaciones Sociológicas (CIS).
 
-X posts are the only corpus of this paper. Parliamentary interventions and interviews are left for a follow-up paper (§4). The general election is expected in early 2027.
+X posts are the only corpus of this paper. Parliamentary interventions and interviews are left for a follow-up paper (§4). The general election is scheduled for 29 November 2026.
 
 ## 2. Relation to the previous paper
 
