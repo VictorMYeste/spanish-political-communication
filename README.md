@@ -109,6 +109,14 @@ The speaker-attribution effect by left, centre and right persona group, and the 
 python src/analyze_ideological_congruence.py
 ```
 
+## Absolute response levels
+
+The levels behind the attribution effects of RQ1 to RQ3: the mean stance and the shares of support, neutral and reject answers in each condition, over the same complete persona-post quartets. They are split by framework and topic, by profile level within a topic, by the leader who actually wrote the post and by persona group. The outputs go to `data/absolute_levels/<model>/`.
+
+```bash
+python src/describe_absolute_levels.py
+```
+
 ## RQ4 analysis
 
 The order of the leaders' preferences by ideological group, personas against CIS respondents (leader ratings from the 48 barometers of the window). Method and outputs in [docs/RQ4_ANALYSIS.md](docs/RQ4_ANALYSIS.md).
