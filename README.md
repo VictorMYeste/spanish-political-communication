@@ -153,7 +153,23 @@ Recheck the official Congreso source and reuse conditions at collection time:
 
 ## Citation
 
-A citation for this project will be added when a preprint is available. Previous study:
+If you use this code, please cite the preprint:
+
+> Víctor Yeste, Candida Maria Greco, Paolo Rosso, and Andrea Tagarelli. 2026. Sánchez, Feijóo, or Abascal? Speaker Attribution and Ideological Congruence in LLM Personas Reading Posts on X of the Leaders of the Three Main Parties of the 29N General Election in Spain. arXiv:2611.29765. https://arxiv.org/abs/2611.29765
+
+```bibtex
+@misc{yeste-etal-2026-sanchez,
+  title         = {S{\'a}nchez, Feij{\'o}o, or Abascal? Speaker Attribution and Ideological Congruence in {LLM} Personas Reading Posts on {X} of the Leaders of the Three Main Parties of the 29{N} General Election in {Spain}},
+  author        = {Yeste, V{\'i}ctor and Greco, Candida Maria and Rosso, Paolo and Tagarelli, Andrea},
+  year          = {2026},
+  eprint        = {2611.29765},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.CL},
+  url           = {https://arxiv.org/abs/2611.29765}
+}
+```
+
+The study it extends:
 
 > Candida Maria Greco, Víctor Yeste, Andrea Tagarelli, and Paolo Rosso. 2026. "My own morality, my own mind": Persona-Conditioned Moral and Cultural Reception on Trump Messages. In *Findings of the Association for Computational Linguistics: EMNLP 2026*.
 
